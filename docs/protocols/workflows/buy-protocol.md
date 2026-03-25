@@ -1,7 +1,9 @@
 # Buy Protocol
 
-**Status:** [IMPLEMENTED] Base flow | [PHASE 2] Escrow phases, timeout, auto-refund
+**Status:** [IMPLEMENTED] Base flow | [PHASE 2] Escrow phases, timeout, auto-refund, OfferType distinction
 **Affects:** `POST /api/tickets`, `PATCH /api/tickets/:id`, `prisma/schema.prisma`
+
+> (PDC: see ADR-021) – Added OfferType SERVICE vs PRODUCT distinction
 
 ## Purpose
 
@@ -10,7 +12,104 @@ from a seller (Initiator).
 
 ---
 
-## Phase 1 — Currently Implemented
+## Offer Types (Phase 2)
+
+| Type    | Description | UI Action | Status after creation | Seller approval |
+|---------|-------------|-----------|----------------------|-----------------|
+| **SERVICE** | 1:1 service per buyer (e.g., consulting, coaching, custom work) | "Request" | `PENDING` | Required |
+| **PRODUCT** | Unlimited quantity (e.g., e-books, digital assets, templates) | "Buy Now" | `IN_PROGRESS` | Auto-accepted |
+
+---
+
+## SERVICE Flow (Seller must approve)
+
+```
+1. Buyer browses offers
+   GET /api/offers
+
+2. Buyer requests service
+   POST /api/tickets
+   { offerId, buyerPubkey, sellerPubkey, amountSats }
+   → Availability check: Buyer has no active ticket for this offer?
+   → Status: PENDING
+   → Seller notification (Nostr Kind 30019)
+
+3. Seller reviews request in dashboard
+   → Sees "Accept" ✓ / "Reject" ✗ buttons
+   
+4a. Seller accepts:
+   PATCH /api/tickets/:id  { action: "accept" }
+   → Status: IN_PROGRESS
+   → Buyer notification
+   → Continue to step 5
+
+4b. Seller rejects:
+   PATCH /api/tickets/:id  { action: "reject" }
+   → Status: CANCELLED
+   → Buyer cannot request again
+
+5. Seller creates Phase 1 invoice (25% reservation)
+   POST /api/tickets/:id/escrow-phase { phase: 1 }
+   → Invoice sent to buyer
+
+6. Buyer pays invoice (in Lightning wallet)
+   → Webhook: POST /api/lightning/webhook
+   → Escrow Status: HELD (25% locked)
+   → Ticket Status: PAID
+
+7. Seller delivers service/goods
+   → Creates Phase 2 invoice (50%)
+   → Buyer pays → Escrow: PARTIALLY_RELEASED (75%)
+
+8. Buyer confirms receipt
+   → Triggers Phase 3 invoice (25%)
+   → Buyer pays → Escrow: FULLY_RELEASED (100%)
+   → Status: COMPLETED
+
+9. Review (Nostr Event Kind 30024, Phase 3)
+```
+
+---
+
+## PRODUCT Flow (Auto-accepted)
+
+```
+1. Buyer browses offers
+   GET /api/offers
+
+2. Buyer clicks "Buy Now"
+   POST /api/tickets
+   { offerId, buyerPubkey, sellerPubkey, amountSats }
+   → Status: IN_PROGRESS (auto-accepted, no seller action needed)
+   → Seller can create invoice immediately
+
+3. Seller creates Phase 1 invoice (25% reservation)
+   POST /api/tickets/:id/escrow-phase { phase: 1 }
+   → Invoice sent to buyer
+
+4. Buyer pays invoice (in Lightning wallet)
+   → Webhook: POST /api/lightning/webhook
+   → Escrow Status: HELD (25% locked)
+   → Ticket Status: PAID
+
+5. Seller delivers product
+   → Creates Phase 2 invoice (50%)
+   → Buyer pays → Escrow: PARTIALLY_RELEASED (75%)
+
+6. Buyer confirms receipt
+   → Triggers Phase 3 invoice (25%)
+   → Buyer pays → Escrow: FULLY_RELEASED (100%)
+   → Status: COMPLETED
+
+7. Review (Nostr Event Kind 30024, Phase 3)
+```
+
+---
+
+## Phase 1 — Legacy (deprecated)
+
+> **Note:** Phase 1 flow (all tickets start in PENDING) is deprecated.
+> New implementations should use SERVICE/PRODUCT distinction.
 
 ```
 1. Buyer browses offers
@@ -43,51 +142,44 @@ from a seller (Initiator).
 
 ---
 
-## Phase 2 — Escrow Flow (planned)
-
-```
-1. Buyer creates ticket
-2. Server creates Phase 1 Hold Invoice (25% reservation)
-   → LNBits Hold Invoice (payment held, not yet released)
-3. Buyer pays → reservation confirmed → Status: ACCEPTED
-4. Seller confirms start of delivery → Status: IN_PROGRESS
-   → Phase 2 Invoice (50%) created
-5. Buyer pays Phase 2 → seller receives 75%
-6. Buyer confirms receipt of service
-   → Phase 3 Invoice (25%) created
-7. Buyer pays Phase 3 → seller receives remaining 25%
-   → Status: COMPLETED
-8. Review (Nostr Event, Phase 3)
-```
-
----
-
 ## Error Cases
 
-| Situation | Phase 1 (now) | Phase 2 (planned) |
-|-----------|--------------|-------------------|
-| Seller does not respond | Manual CANCELLED | Timeout (72h) → auto-CANCELLED + refund |
-| Buyer does not pay | Ticket stays PENDING | BOLT11 expiry → auto-CANCELLED |
-| Dispute after delivery | DISPUTED, manual resolution | Dispute Protocol (Phase 4) |
-| Partial failure | Manual resolution | Escrow phase split via Dispute |
+| Situation | SERVICE Flow | PRODUCT Flow | Phase 2 (planned) |
+|-----------|--------------|--------------|-------------------|
+| Seller does not respond | Manual CANCELLED | N/A (auto-accepted) | Timeout (72h) → auto-CANCELLED + refund |
+| Buyer does not pay | Ticket stays PENDING | Ticket stays PAID | BOLT11 expiry → auto-CANCELLED |
+| Dispute after delivery | DISPUTED, manual resolution | DISPUTED, manual resolution | Dispute Protocol (Phase 4) |
+| Partial failure | Manual resolution | Manual resolution | Escrow phase split via Dispute |
 
 ---
 
-## Database State (Phase 1)
+## Database State (Phase 2)
 
 ```typescript
-// After step 2 (ticket created):
+// SERVICE Ticket after creation:
 {
   status: "PENDING",
-  lightningInvoice: "lnbc...",  // null if no LNBits configured
+  offerType: "SERVICE",
+  lightningInvoice: null,  // Created after seller accepts
   amountSats: 1000
 }
 
-// After step 3 / step 4 (accepted):
+// SERVICE Ticket after seller accepts:
 { status: "IN_PROGRESS" }
 
-// After step 6 (completed):
-{ status: "COMPLETED" }
+// PRODUCT Ticket after creation:
+{
+  status: "IN_PROGRESS",  // Auto-accepted
+  offerType: "PRODUCT",
+  lightningInvoice: null,  // Seller can create immediately
+  amountSats: 1000
+}
+
+// After payment:
+{ status: "PAID", escrowStatus: "HELD" }
+
+// After completion:
+{ status: "COMPLETED", escrowStatus: "RELEASED_FULL" }
 
 // On dispute:
 { status: "DISPUTED", disputeReason: "Item never arrived" }

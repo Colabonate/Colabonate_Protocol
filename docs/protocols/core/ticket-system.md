@@ -4,6 +4,8 @@ The ticket is the core of Colabonate. Every interaction between parties is
 represented as a ticket — it is simultaneously a contract, a payment instruction,
 and a communication channel.
 
+> (PDC: see ADR-021) – Added OfferType SERVICE vs PRODUCT distinction
+
 ## Current State (Phase 1 — implemented)
 
 The schema has a single ticket type with these fields:
@@ -47,14 +49,75 @@ PENDING
 
 ## Current Schema — Additional Fields (Phase 2+)
 
-The Phase 1 schema is extended in Phase 2 with legal binding fields and ticket type:
+The Phase 1 schema is extended in Phase 2 with legal binding fields, ticket type, and offer type:
+
+```prisma
+model Ticket {
+  id               String       @id @default(cuid())
+  offerId          String
+  buyerPubkey      String
+  sellerPubkey     String
+  status           TicketStatus @default(PENDING)
+  offerType        OfferType    @default(SERVICE)  // NEW: SERVICE | PRODUCT
+  ticketType       TicketType   @default(SMART_ORDER)
+  daoId            String?      // DAO binding (see legal-binding-layer.md)
+  codexHash        String?      // SHA-256 of Codex at binding time
+  codexVersion     String?      // Human-readable Codex version (e.g. "1.2")
+  escrowStatus     EscrowStatus?
+  
+  // Escrow phase invoices
+  phase1Invoice    String?
+  phase2Invoice    String?
+  phase3Invoice    String?
+  deliveryConfirmedAt DateTime?
+  
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+enum OfferType {
+  SERVICE   // 1x per buyer, seller must accept
+  PRODUCT   // unlimited quantity, auto-accepted
+}
+
+enum TicketType {
+  SMART_ORDER
+  MILESTONE
+  DISPUTE
+  GOVERNANCE
+  VERIFICATION
+  ROYALTY
+}
+
+enum EscrowStatus {
+  FUNDED
+  RELEASE_PHASE_1
+  RELEASE_PHASE_2
+  RELEASE_PHASE_3
+  RELEASED_FULL
+  REFUNDED
+}
+```
+
+**OfferType Behavior:**
+
+| OfferType | Status after creation | Seller approval required | UI Action |
+|-----------|----------------------|-------------------------|-----------|
+| SERVICE   | PENDING              | Yes                     | "Request" |
+| PRODUCT   | IN_PROGRESS          | No (auto-accepted)      | "Buy Now" |
+
+**Status Flow (Phase 2):**
 
 ```
-ticketType       TicketType    @default(SMART_ORDER)
-daoId            String?       // DAO binding (see legal-binding-layer.md)
-codexHash        String?       // SHA-256 of Codex at binding time
-codexVersion     String?       // Human-readable Codex version (e.g. "1.2")
-escrowStatus     EscrowStatus?
+SERVICE Flow:
+PENDING ──(accept)──► IN_PROGRESS ──► PAID ──► COMPLETED
+          (reject)──► CANCELLED
+
+PRODUCT Flow:
+IN_PROGRESS ──► PAID ──► COMPLETED  (no PENDING state)
+
+Both Flows:
+Any state ──► DISPUTED ──► COMPLETED | CANCELLED
 ```
 
 When `daoId` + `codexHash` are set, the ticket is bound to a DAO Codex.

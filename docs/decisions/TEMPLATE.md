@@ -1,60 +1,31 @@
-# ADR Template
+# [NNN] – [Decision Title]
 
-Use this template when creating a new Architecture Decision Record.
-
-```markdown
-# [XXX] – Title
-
-**Status:** proposed | accepted | deprecated | rejected
+**Status:** proposed | accepted | deprecated | superseded
 **Date:** YYYY-MM-DD
-**Decider:** Name (Role)
+**Affects:** [Area, e.g. packages/ui, apps/server, Token-Pipeline]
 
 ## Context
 
-Describe the problem or question that requires this decision.
+What was the situation? What problem or requirement triggered this decision?
 
 ## Decision
 
-Describe the decision made. Use active voice:
-"We use X for Y" instead of "X should be used".
+What was decided? Be concrete and precise.
 
-## Alternatives
+## Rejected Alternatives
 
-### 1. Alternative A
-- Description
-- Why rejected/not chosen
-
-### 2. Alternative B
-- Description
-- Why rejected/not chosen
+- **Alternative A** – why not?
+- **Alternative B** – why not?
 
 ## Consequences
 
-### Positive
-- [ ] Benefit 1
-- [ ] Benefit 2
+What follows from this decision?
 
-### Negative
-- [ ] Drawback 1
-- [ ] Drawback 2
-
-## Affected Documents
-
-- docs/protocols/...
-- docs/decisions/...
+- What do agents/developers need to know when working in this area?
+- What limitations arise?
+- What becomes easier, what becomes harder?
 
 ## References
 
-- External references (if relevant)
-
----
-
-*Decision made by [Name] | YYYY-MM-DD*
-```
-
-## Instructions
-
-1. Copy this template to `docs/decisions/XXX-title.md`
-2. Replace XXX with the next available number (see INDEX.md)
-3. Fill in all sections
-4. Update INDEX.md with the new ADR entry
+- Relevant files: `path/to/file.ts`
+- Related ADRs: [002-...](002-....md)
