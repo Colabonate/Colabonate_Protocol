@@ -1,5 +1,13 @@
 # Ticket System – Colabonate
 
+**Normativity:** Normative
+
+**Version:** 1.0.0-draft
+**Date:** 2026-04-18
+**Status:** [IMPLEMENTED] Phase 1 ticket flow (PENDING → IN_PROGRESS → COMPLETED/DISPUTED/CANCELLED) | [IMPLEMENTED] Ticket types SMART_ORDER, MILESTONE, DISPUTE, GOVERNANCE, VERIFICATION, ROYALTY | [IMPLEMENTED] OfferType SERVICE, PRODUCT, ITEM, COOP (ADR-022, ADR-066, ADR-113) | [IMPLEMENTED] Extended statuses PAID (ADR-121), ARBITRATION_LOST/WON (ADR-125/126) | [RESERVED] INTEREST_SENT (ADR-129, PROB-001)
+
+---
+
 The ticket is the core of Colabonate. Every interaction between parties is
 represented as a ticket — it is simultaneously a contract, a payment instruction,
 and a communication channel.
@@ -16,7 +24,7 @@ model Ticket {
   offerId          String
   buyerPubkey      String       // = Partner
   sellerPubkey     String       // = Initiator
-  status           TicketStatus @default(PENDING)
+  status           String       @default("PENDING") // Volatile: TicketStatus values, zod-validated
   lightningInvoice String?
   paymentHash      String?
   amountSats       Int?
@@ -36,6 +44,10 @@ GET    /api/tickets/:id/payment-status    Payment polling (LNBits)
 ```
 
 ## Status Flow (Phase 1)
+
+> (PDC: see ADR-021) – Added OfferType SERVICE vs PRODUCT distinction
+
+> **Additional statuses in code:** The `TicketStatus` type validated by Zod also includes `INTEREST_SENT` (reserved/unused — cooperation-interest flow per PROB-001, ADR-129), `PAID` (cooperation escrow, ADR-121), and `ARBITRATION_LOST`/`ARBITRATION_WON` (dispute resolution, ADR-125/126). These are not shown in the Phase 1 flow above.
 
 ```
 PENDING
@@ -57,13 +69,13 @@ model Ticket {
   offerId          String
   buyerPubkey      String
   sellerPubkey     String
-  status           TicketStatus @default(PENDING)
+  status           String       @default("PENDING") // Volatile: TicketStatus values, zod-validated
   offerType        OfferType    @default(SERVICE)  // NEW: SERVICE | PRODUCT
   ticketType       TicketType   @default(SMART_ORDER)
   daoId            String?      // DAO binding (see legal-binding-layer.md)
   codexHash        String?      // SHA-256 of Codex at binding time
   codexVersion     String?      // Human-readable Codex version (e.g. "1.2")
-  escrowStatus     EscrowStatus?
+  escrowStatus     String       @default("NONE") // Volatile: EscrowStatus values, zod-validated
   
   // Escrow phase invoices
   phase1Invoice    String?
@@ -89,15 +101,14 @@ enum TicketType {
   ROYALTY
 }
 
-enum EscrowStatus {
-  FUNDED
-  RELEASE_PHASE_1
-  RELEASE_PHASE_2
-  RELEASE_PHASE_3
-  RELEASED_FULL
-  REFUNDED
-}
+// NOTE: ADR-139 removed Prisma enums for status fields in favor of zod validation at the app boundary.
+// EscrowStatus values (zod-validated, see escrow-protocol.md):
+// NONE, INITIATED, PHASE_1_PENDING, RESERVED, PHASE_2_PENDING, DELIVERY_STARTED, PHASE_3_PENDING, DELIVERY_CONFIRMED, RELEASED, CANCELLED, DISPUTED, FUNDED, RELEASE_PHASE_1, RELEASE_PHASE_2, RELEASE_PHASE_3, RELEASED_FULL, REFUNDED
 ```
+
+> **⚠️ EscrowStatus note:** The Prisma schema uses string validation (`EscrowStatusSchema`). The active set (INITIATED, PHASE_1_PENDING, RESERVED, etc.) is defined in [escrow-protocol.md](./escrow-protocol.md) and used by `apps/server/routes/escrow.ts` (ADR-124). The legacy set (FUNDED, RELEASE_PHASE_1, etc.) from an earlier spec draft remains valid in the Zod schema but is unused.
+>
+> (PDC: see ADR-124)
 
 **OfferType Behavior:**
 
@@ -139,7 +150,7 @@ Buy/sell with Lightning escrow phases.
 **Required schema changes:**
 ```prisma
 ticketType       TicketType    @default(SMART_ORDER)
-escrowStatus     EscrowStatus?
+escrowStatus     String        @default("NONE") // Volatile: EscrowStatus values, zod-validated
 phase1Invoice    String?
 phase2Invoice    String?
 phase3Invoice    String?
@@ -292,3 +303,8 @@ Verification Ticket
 | Protocol usage | Royalty Ticket | Phase 5 |
 | Structured feedback | Rating Ticket | Phase 3 |
 | Returns / Refunds | Return Ticket | Phase 4 |
+
+
+---
+
+*Part of the Colabonate Protocol Specification | [docs/protocols/](../README.md)*

@@ -1,5 +1,7 @@
 # Payment Architecture – Multi-Layer Bitcoin Stack
 
+**Normativity:** Descriptive
+
 **Version:** 1.0.0-draft
 **Date:** 2026-03-22
 **Status:** [IMPLEMENTED] Layer 1 + basic Lightning | [PHASE 2] Lightspark Grid | [PHASE 4] RSK Contract Layer
@@ -253,9 +255,9 @@ Per Whitepaper Section 3.2, every transaction must be linked to the validated Hu
 
 | Decision | Choice | ADR |
 |---------|--------|-----|
-| Why three layers instead of one | Different trade-offs: L1 (security), Lightning (speed/cost), RSK (logic) | [ADR 012](../../decisions/012-payment-layer-architecture.md) |
-| Why Lightspark Grid over raw LND | Enterprise reliability, automatic liquidity, managed model for users | [ADR 012](../../decisions/012-payment-layer-architecture.md) |
-| Why RSK over other Bitcoin sidechains | Bitcoin merge-mining security, EVM tooling availability, 1:1 BTC peg | [ADR 010](../../decisions/010-lnbits-hold-invoice-escrow.md) |
+| Why three layers instead of one | Different trade-offs: L1 (security), Lightning (speed/cost), RSK (logic) | [ADR 013](../../decisions/013-payment-layer-architecture.md) |
+| Why Lightspark Grid over raw LND | Enterprise reliability, automatic liquidity, managed model for users | [ADR 013](../../decisions/013-payment-layer-architecture.md) |
+| Why RSK over other Bitcoin sidechains | Bitcoin merge-mining security, EVM tooling availability, 1:1 BTC peg | [ADR 011](../../decisions/011-lnbits-hold-invoice-escrow.md) |
 
 ---
 
@@ -287,7 +289,7 @@ Per Whitepaper Section 3.2, every transaction must be linked to the validated Hu
 
 ## References
 
-- [Whitepaper v6, Section 3.1–3.2](../../Colabonate_Konzepte_privat/Konzept/Whitepaper/Whitepaper-Colabonate-v6-Final-Public-Release.md) — authoritative source
+- Whitepaper v6, Section 3.1–3.2 — authoritative internal reference (not publicly distributed)
 - [docs/protocols/core/escrow-protocol.md](./escrow-protocol.md) — escrow mechanics
 - [docs/protocols/identity/identity-protocol.md](../identity/identity-protocol.md) — HID levels
 - [docs/protocols/governance/economic-protocol.md](../governance/economic-protocol.md) — COLA token

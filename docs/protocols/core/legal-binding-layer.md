@@ -1,5 +1,7 @@
 # Legal Binding Layer – Opt-in DAO+Codex Binding
 
+**Normativity:** Descriptive
+
 **Version:** 1.0.0-draft
 **Date:** 2026-03-22
 **Status:** [PHASE 4]

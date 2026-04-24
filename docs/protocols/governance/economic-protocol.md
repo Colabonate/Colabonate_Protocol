@@ -17,7 +17,7 @@ This distinction is fundamental:
 - **COL-Points** — non-transferable reputation accumulation (off-chain)
 - **COLA token** — transferable governance token (on RSK sidechain)
 
-See [ADR 011](../../decisions/011-col-points-vs-cola-token.md) for the rationale for this separation.
+See [ADR 012](../../decisions/012-col-points-vs-cola-token.md) for the rationale for this separation.
 
 ---
 
@@ -161,7 +161,7 @@ The Foundation explicitly does NOT collect fees on base protocol usage (buy/sell
 
 ## References
 
-- [ADR 011: COL-Points vs COLA Token](../../decisions/011-col-points-vs-cola-token.md)
+- [ADR 012: COL-Points vs COLA Token](../../decisions/012-col-points-vs-cola-token.md)
 - [docs/protocols/core/reputation-protocol.md](../core/reputation-protocol.md) — COL-Points
 - [docs/protocols/governance/dao-codex.md](./dao-codex.md) — Governance voting models
 - [docs/protocols/core/nostr-events.md](../core/nostr-events.md) — Kind 30025 (stake events)

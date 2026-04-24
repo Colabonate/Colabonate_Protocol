@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_4"
+                  targetNamespace="http://colabonate.org/protocols/bpmn"
+                  exporter="Colabonate Protocol"
+                  exporterVersion="1.0.0">
+
+  <bpmn:process id="CooperationFlow" name="Cooperation / Joint Project Flow" isExecutable="false">
+
+    <!-- ========== START ========== -->
+    <bpmn:startEvent id="Start_CoopInit" name="Cooperation&#10;Initiated">
+      <bpmn:outgoing>Flow_DescribeGoal</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- ========== PHASE A: Initiation & Matching ========== -->
+    <bpmn:userTask id="Task_DescribeGoal" name="Describe Goal&#10;(title, description,&#10;skills, budget, timeline)">
+      <bpmn:incoming>Flow_DescribeGoal</bpmn:incoming>
+      <bpmn:outgoing>Flow_PublishOrDirect</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_Matching" name="Matching&#10;Method">
+      <bpmn:incoming>Flow_PublishOrDirect</bpmn:incoming>
+      <bpmn:outgoing>Flow_PublishNostr</bpmn:outgoing>
+      <bpmn:outgoing>Flow_DirectMessage</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="Task_PublishNostr" name="Publish via Nostr&#10;(Kind 30018)">
+      <bpmn:incoming>Flow_PublishNostr</bpmn:incoming>
+      <bpmn:outgoing>Flow_WaitResponse</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:serviceTask id="Task_DirectMessage" name="Send Nostr DM&#10;(NIP-04 Encrypted)">
+      <bpmn:incoming>Flow_DirectMessage</bpmn:incoming>
+      <bpmn:outgoing>Flow_WaitResponse</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_PartnerResponds" name="Partner Responds&#10;(interest / counter-offer)">
+      <bpmn:incoming>Flow_WaitResponse</bpmn:incoming>
+      <bpmn:outgoing>Flow_AgreeTerms</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_NegotiateTerms" name="Negotiate Terms&#10;(budget, scope, timeline)">
+      <bpmn:incoming>Flow_AgreeTerms</bpmn:incoming>
+      <bpmn:outgoing>Flow_BothAgree</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_TermsAgreed" name="Terms&#10;Agreed?">
+      <bpmn:incoming>Flow_BothAgree</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreateTicket</bpmn:outgoing>
+      <bpmn:outgoing>Flow_CancelNegotiation</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="End_CancelNegotiation" name="Negotiation&#10;Cancelled">
+      <bpmn:incoming>Flow_CancelNegotiation</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ========== PHASE B: Contract Formation ========== -->
+    <bpmn:serviceTask id="Task_CreateTicket" name="POST /api/tickets&#10;ticketType: MILESTONE">
+      <bpmn:incoming>Flow_CreateTicket</bpmn:incoming>
+      <bpmn:outgoing>Flow_DefineMilestones</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_DefineMilestones" name="Define Milestones&#10;(title, description,&#10;dueDate, amountSats,&#10;acceptanceCriteria)">
+      <bpmn:incoming>Flow_DefineMilestones</bpmn:incoming>
+      <bpmn:outgoing>Flow_CoopType</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Cooperation Type Selection -->
+    <bpmn:exclusiveGateway id="Gateway_CoopType" name="Cooperation&#10;Type">
+      <bpmn:incoming>Flow_CoopType</bpmn:incoming>
+      <bpmn:outgoing>Flow_Transactional</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Production</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Service</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Educational</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Barter</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Different cooperation types (annotation tasks) -->
+    <bpmn:task id="Task_CoopType_Note" name="All types share&#10;same Milestone&#10;Ticket foundation">
+      <bpmn:incoming>Flow_Transactional</bpmn:incoming>
+      <bpmn:incoming>Flow_Production</bpmn:incoming>
+      <bpmn:incoming>Flow_Service</bpmn:incoming>
+      <bpmn:incoming>Flow_Educational</bpmn:incoming>
+      <bpmn:incoming>Flow_Barter</bpmn:incoming>
+      <bpmn:outgoing>Flow_PartnerSign</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:serviceTask id="Task_PartnerSigns" name="Partner Signs&#10;(Nostr Event as&#10;confirmation)">
+      <bpmn:incoming>Flow_PartnerSign</bpmn:incoming>
+      <bpmn:outgoing>Flow_EscrowDeposit</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:serviceTask id="Task_EscrowDeposit" name="Escrow Deposit&#10;(Full Amount&#10;Hold Invoice)">
+      <bpmn:incoming>Flow_EscrowDeposit</bpmn:incoming>
+      <bpmn:outgoing>Flow_ExecutionPhase</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- ========== PHASE C: Execution (Multi-Party) ========== -->
+    <bpmn:subProcess id="SubProcess_Execution" name="Execution &amp; Tracking" isTriggeredByEvent="false">
+
+      <bpmn:startEvent id="Start_Execution" name="Begin&#10;Execution">
+        <bpmn:outgoing>Flow_MS_Start</bpmn:outgoing>
+      </bpmn:startEvent>
+
+      <!-- Per-milestone execution -->
+      <bpmn:serviceTask id="Task_MS_SetActive" name="Milestone:&#10;IN_PROGRESS">
+        <bpmn:incoming>Flow_MS_Start</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Execute</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:userTask id="Task_MS_Execute" name="Execute Milestone&#10;Work (N parties)">
+        <bpmn:incoming>Flow_MS_Execute</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Report</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_MS_ReportCompletion" name="Report Completion&#10;+ Evidence">
+        <bpmn:incoming>Flow_MS_Report</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Review</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_MS_InitiatorReview" name="Initiator Reviews&#10;Acceptance Criteria">
+        <bpmn:incoming>Flow_MS_Review</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Gateway</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:exclusiveGateway id="Gateway_MS_Approval" name="Approved?">
+        <bpmn:incoming>Flow_MS_Gateway</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_PayRelease</bpmn:outgoing>
+        <bpmn:outgoing>Flow_MS_RequestRevision</bpmn:outgoing>
+        <bpmn:outgoing>Flow_MS_Dispute</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <bpmn:serviceTask id="Task_MS_PartialPayment" name="Partial Payment&#10;Released (proportional&#10;from escrow)">
+        <bpmn:incoming>Flow_MS_PayRelease</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_MarkComplete</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:serviceTask id="Task_MS_Complete" name="Milestone:&#10;COMPLETED">
+        <bpmn:incoming>Flow_MS_MarkComplete</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_CheckMore</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:exclusiveGateway id="Gateway_MS_MoreCheck" name="More&#10;Milestones?">
+        <bpmn:incoming>Flow_MS_CheckMore</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Loop</bpmn:outgoing>
+        <bpmn:outgoing>Flow_MS_AllComplete</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <!-- Revisions -->
+      <bpmn:task id="Task_MS_RequestRevision" name="Request Revisions&#10;(back to work)">
+        <bpmn:incoming>Flow_MS_RequestRevision</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_RevisionWork</bpmn:outgoing>
+      </bpmn:task>
+
+      <!-- Dispute -->
+      <bpmn:endEvent id="End_MS_Disputed" name="DISPUTED">
+        <bpmn:incoming>Flow_MS_Dispute</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:endEvent id="End_Execution" name="All Milestones&#10;Complete">
+        <bpmn:incoming>Flow_MS_AllComplete</bpmn:outgoing>
+      </bpmn:endEvent>
+
+      <!-- Flows -->
+      <bpmn:sequenceFlow id="Flow_MS_Start" sourceRef="Start_Execution" targetRef="Task_MS_SetActive" />
+      <bpmn:sequenceFlow id="Flow_MS_Execute" sourceRef="Task_MS_SetActive" targetRef="Task_MS_Execute" />
+      <bpmn:sequenceFlow id="Flow_MS_Report" sourceRef="Task_MS_Execute" targetRef="Task_MS_ReportCompletion" />
+      <bpmn:sequenceFlow id="Flow_MS_Review" sourceRef="Task_MS_ReportCompletion" targetRef="Task_MS_InitiatorReview" />
+      <bpmn:sequenceFlow id="Flow_MS_Gateway" sourceRef="Task_MS_InitiatorReview" targetRef="Gateway_MS_Approval" />
+      <bpmn:sequenceFlow id="Flow_MS_PayRelease" name="Yes" sourceRef="Gateway_MS_Approval" targetRef="Task_MS_PartialPayment" />
+      <bpmn:sequenceFlow id="Flow_MS_RequestRevision" name="Revisions" sourceRef="Gateway_MS_Approval" targetRef="Task_MS_RequestRevision" />
+      <bpmn:sequenceFlow id="Flow_MS_Dispute" name="Dispute" sourceRef="Gateway_MS_Approval" targetRef="End_MS_Disputed" />
+      <bpmn:sequenceFlow id="Flow_MS_MarkComplete" sourceRef="Task_MS_PartialPayment" targetRef="Task_MS_Complete" />
+      <bpmn:sequenceFlow id="Flow_MS_CheckMore" sourceRef="Task_MS_Complete" targetRef="Gateway_MS_MoreCheck" />
+      <bpmn:sequenceFlow id="Flow_MS_Loop" name="Yes" sourceRef="Gateway_MS_MoreCheck" targetRef="Start_Execution" />
+      <bpmn:sequenceFlow id="Flow_MS_AllComplete" name="No" sourceRef="Gateway_MS_MoreCheck" targetRef="End_Execution" />
+      <bpmn:sequenceFlow id="Flow_MS_RevisionWork" sourceRef="Task_MS_RequestRevision" targetRef="Task_MS_Execute" />
+
+    </bpmn:subProcess>
+
+    <bpmn:sequenceFlow id="Flow_ExecutionPhase" sourceRef="Task_EscrowDeposit" targetRef="SubProcess_Execution" />
+
+    <!-- ========== PHASE D: Completion & Reputation ========== -->
+    <bpmn:serviceTask id="Task_TicketCompleted" name="Ticket: COMPLETED">
+      <bpmn:incoming>Flow_ExecutionDone</bpmn:incoming>
+      <bpmn:outgoing>Flow_ReviewPhase</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_MutualReviews" name="Mutual Reviews&#10;(Both Parties,&#10;Kind 30024)">
+      <bpmn:incoming>Flow_ReviewPhase</bpmn:incoming>
+      <bpmn:outgoing>Flow_COLPoints</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_COLPoints" name="COL-Points&#10;Awarded">
+      <bpmn:incoming>Flow_COLPoints</bpmn:incoming>
+      <bpmn:outgoing>Flow_ReputationUpdate</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:serviceTask id="Task_ReputationUpdate" name="Reputation Bound&#10;to Pubkeys">
+      <bpmn:incoming>Flow_ReputationUpdate</bpmn:incoming>
+      <bpmn:outgoing>Flow_CoopDone</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_CoopCompleted" name="Cooperation&#10;COMPLETED ✓">
+      <bpmn:incoming>Flow_CoopDone</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ========== PHASE E: Dispute (from subprocess) ========== -->
+    <bpmn:boundaryEvent id="Event_CoopDispute" name="Dispute Raised" attachedToRef="SubProcess_Execution">
+      <bpmn:outgoing>Flow_DisputeFlow</bpmn:outgoing>
+    </bpmn:boundaryEvent>
+
+    <bpmn:subProcess id="SubProcess_Dispute" name="Dispute Protocol" isTriggeredByEvent="true">
+
+      <bpmn:startEvent id="Start_Dispute" name="Dispute Opened" isInterrupting="true">
+        <bpmn:outgoing>Flow_D_Level1</bpmn:outgoing>
+      </bpmn:startEvent>
+
+      <!-- Level 1: Cooling-off (7 days) -->
+      <bpmn:userTask id="Task_Level1_Cooling" name="Level 1: Cooling-Off&#10;(7 days, Nostr DM)">
+        <bpmn:incoming>Flow_D_Level1</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_L1Gateway</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:exclusiveGateway id="Gateway_D_L1" name="Agreement?">
+        <bpmn:incoming>Flow_D_L1Gateway</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_L1Resolved</bpmn:outgoing>
+        <bpmn:outgoing>Flow_D_Escalate2</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <!-- Level 2: Mediation (14 days) -->
+      <bpmn:serviceTask id="Task_Level2_Mediator" name="Level 2: Mediator&#10;Elected (verified pool)">
+        <bpmn:incoming>Flow_D_Escalate2</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_Mediate</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:userTask id="Task_Level2_Mediation" name="Mediation&#10;(14 days)">
+        <bpmn:incoming>Flow_D_Mediate</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_L2Gateway</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:exclusiveGateway id="Gateway_D_L2" name="Both Accept?">
+        <bpmn:incoming>Flow_D_L2Gateway</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_L2Resolved</bpmn:outgoing>
+        <bpmn:outgoing>Flow_D_Escalate3</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <!-- Level 3: DAO Court (24-48h) -->
+      <bpmn:serviceTask id="Task_Level3_Arbitrators" name="Level 3: 3-5&#10;Arbitrators Elected&#10;(Governance Ticket)">
+        <bpmn:incoming>Flow_D_Escalate3</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_DAOVote</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:userTask id="Task_Level3_Vote" name="DAO Court Vote&#10;(24-48h, anonymous)">
+        <bpmn:incoming>Flow_D_DAOVote</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_Verdict</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:serviceTask id="Task_Level3_Verdict" name="Verdict Published&#10;(Nostr Event,&#10;Kind 30019)">
+        <bpmn:incoming>Flow_D_Verdict</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_Enforce</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:serviceTask id="Task_Level3_Enforce" name="Escrow Split&#10;per Verdict">
+        <bpmn:incoming>Flow_D_Enforce</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_ReputationPenalty</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:serviceTask id="Task_Level3_Reputation" name="Reputation Impact&#10;(losing party penalty)">
+        <bpmn:incoming>Flow_D_ReputationPenalty</bpmn:incoming>
+        <bpmn:outgoing>Flow_D_Resolved</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:endEvent id="End_Dispute_Resolved" name="RESOLVED">
+        <bpmn:incoming>Flow_D_L1Resolved</bpmn:incoming>
+        <bpmn:incoming>Flow_D_L2Resolved</bpmn:incoming>
+        <bpmn:incoming>Flow_D_Resolved</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <!-- Dispute flows -->
+      <bpmn:sequenceFlow id="Flow_D_Level1" sourceRef="Start_Dispute" targetRef="Task_Level1_Cooling" />
+      <bpmn:sequenceFlow id="Flow_D_L1Gateway" sourceRef="Task_Level1_Cooling" targetRef="Gateway_D_L1" />
+      <bpmn:sequenceFlow id="Flow_D_L1Resolved" name="Resolved" sourceRef="Gateway_D_L1" targetRef="End_Dispute_Resolved" />
+      <bpmn:sequenceFlow id="Flow_D_Escalate2" name="Escalate" sourceRef="Gateway_D_L1" targetRef="Task_Level2_Mediator" />
+      <bpmn:sequenceFlow id="Flow_D_Mediate" sourceRef="Task_Level2_Mediator" targetRef="Task_Level2_Mediation" />
+      <bpmn:sequenceFlow id="Flow_D_L2Gateway" sourceRef="Task_Level2_Mediation" targetRef="Gateway_D_L2" />
+      <bpmn:sequenceFlow id="Flow_D_L2Resolved" name="Both Accept" sourceRef="Gateway_D_L2" targetRef="End_Dispute_Resolved" />
+      <bpmn:sequenceFlow id="Flow_D_Escalate3" name="Escalate" sourceRef="Gateway_D_L2" targetRef="Task_Level3_Arbitrators" />
+      <bpmn:sequenceFlow id="Flow_D_DAOVote" sourceRef="Task_Level3_Arbitrators" targetRef="Task_Level3_Vote" />
+      <bpmn:sequenceFlow id="Flow_D_Verdict" sourceRef="Task_Level3_Vote" targetRef="Task_Level3_Verdict" />
+      <bpmn:sequenceFlow id="Flow_D_Enforce" sourceRef="Task_Level3_Verdict" targetRef="Task_Level3_Enforce" />
+      <bpmn:sequenceFlow id="Flow_D_ReputationPenalty" sourceRef="Task_Level3_Enforce" targetRef="Task_Level3_Reputation" />
+      <bpmn:sequenceFlow id="Flow_D_Resolved" sourceRef="Task_Level3_Reputation" targetRef="End_Dispute_Resolved" />
+
+    </bpmn:subProcess>
+
+    <bpmn:sequenceFlow id="Flow_DisputeFlow" sourceRef="Event_CoopDispute" targetRef="SubProcess_Dispute" />
+
+    <!-- ========== MAIN SEQUENCE FLOWS ========== -->
+    <bpmn:sequenceFlow id="Flow_DescribeGoal" sourceRef="Start_CoopInit" targetRef="Task_DescribeGoal" />
+    <bpmn:sequenceFlow id="Flow_PublishOrDirect" sourceRef="Task_DescribeGoal" targetRef="Gateway_Matching" />
+    <bpmn:sequenceFlow id="Flow_PublishNostr" name="Public" sourceRef="Gateway_Matching" targetRef="Task_PublishNostr" />
+    <bpmn:sequenceFlow id="Flow_DirectMessage" name="Direct" sourceRef="Gateway_Matching" targetRef="Task_DirectMessage" />
+    <bpmn:sequenceFlow id="Flow_WaitResponse" sourceRef="Task_PublishNostr" targetRef="Task_PartnerResponds" />
+    <bpmn:sequenceFlow id="Flow_AgreeTerms" sourceRef="Task_PartnerResponds" targetRef="Task_NegotiateTerms" />
+    <bpmn:sequenceFlow id="Flow_BothAgree" sourceRef="Task_NegotiateTerms" targetRef="Gateway_TermsAgreed" />
+    <bpmn:sequenceFlow id="Flow_CreateTicket" name="Agreed" sourceRef="Gateway_TermsAgreed" targetRef="Task_CreateTicket" />
+    <bpmn:sequenceFlow id="Flow_CancelNegotiation" name="Cancelled" sourceRef="Gateway_TermsAgreed" targetRef="End_CancelNegotiation" />
+    <bpmn:sequenceFlow id="Flow_DefineMilestones" sourceRef="Task_CreateTicket" targetRef="Task_DefineMilestones" />
+    <bpmn:sequenceFlow id="Flow_CoopType" sourceRef="Task_DefineMilestones" targetRef="Gateway_CoopType" />
+    <bpmn:sequenceFlow id="Flow_Transactional" name="Transactional" sourceRef="Gateway_CoopType" targetRef="Task_CoopType_Note" />
+    <bpmn:sequenceFlow id="Flow_Production" name="Production" sourceRef="Gateway_CoopType" targetRef="Task_CoopType_Note" />
+    <bpmn:sequenceFlow id="Flow_Service" name="Service" sourceRef="Gateway_CoopType" targetRef="Task_CoopType_Note" />
+    <bpmn:sequenceFlow id="Flow_Educational" name="Educational" sourceRef="Gateway_CoopType" targetRef="Task_CoopType_Note" />
+    <bpmn:sequenceFlow id="Flow_Barter" name="Barter" sourceRef="Gateway_CoopType" targetRef="Task_CoopType_Note" />
+    <bpmn:sequenceFlow id="Flow_PartnerSign" sourceRef="Task_CoopType_Note" targetRef="Task_PartnerSigns" />
+    <bpmn:sequenceFlow id="Flow_EscrowDeposit" sourceRef="Task_PartnerSigns" targetRef="Task_EscrowDeposit" />
+    <bpmn:sequenceFlow id="Flow_ExecutionDone" sourceRef="SubProcess_Execution" targetRef="Task_TicketCompleted" />
+    <bpmn:sequenceFlow id="Flow_ReviewPhase" sourceRef="Task_TicketCompleted" targetRef="Task_MutualReviews" />
+    <bpmn:sequenceFlow id="Flow_COLPoints" sourceRef="Task_MutualReviews" targetRef="Task_COLPoints" />
+    <bpmn:sequenceFlow id="Flow_ReputationUpdate" sourceRef="Task_COLPoints" targetRef="Task_ReputationUpdate" />
+    <bpmn:sequenceFlow id="Flow_CoopDone" sourceRef="Task_ReputationUpdate" targetRef="End_CoopCompleted" />
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_4">
+    <bpmndi:BPMNPlane id="BPMNPlane_4" bpmnElement="CooperationFlow">
+      <bpmndi:BPMNShape id="Shape_Start_CoopInit" bpmnElement="Start_CoopInit">
+        <dc:Bounds x="160" y="300" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SubProcess_Execution" bpmnElement="SubProcess_Execution" isExpanded="false">
+        <dc:Bounds x="860" y="240" width="320" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SubProcess_Dispute" bpmnElement="SubProcess_Dispute" isExpanded="false">
+        <dc:Bounds x="860" y="440" width="320" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_CoopCompleted" bpmnElement="End_CoopCompleted">
+        <dc:Bounds x="1400" y="300" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_CancelNegotiation" bpmnElement="End_CancelNegotiation">
+        <dc:Bounds x="560" y="300" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

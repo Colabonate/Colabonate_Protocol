@@ -1,5 +1,7 @@
 # Roles in the Colabonate System
 
+**Normativity:** Normative
+
 **Status:**
 - Initiator, Partner: [IMPLEMENTED] (via Ticket schema)
 - Mediator, Arbitrator: [PHASE 4]
@@ -56,37 +58,32 @@ Finds offers and buys or cooperates.
 
 ---
 
-### Mediator [PHASE 4]
+### Mediator [DEFERRED — Phase 3]
 
-Community expert who mediates at dispute level 2.
+Level 2 mediator role. **Not yet implemented** — disputes in bootstrap mode skip directly from Level 1 (cooling-off) to Level 3 (Council).
 
-**Requirements:**
-- Valid Verification Ticket (Phase 3, reputation score above threshold)
-- No stake in either disputing party
-
-**Actions:**
-- View ticket history and submitted evidence
-- Propose a resolution (non-binding)
-- 14-day mediation window
-
-**Limitation:** Mediators cannot force payments. They can only make a proposal
-that both parties must voluntarily accept.
+See [arbitration-council.md](../governance/arbitration-council.md) Appendix A for details.
 
 ---
 
-### Arbitrator [PHASE 4]
+### Arbitrator [BOOTSTRAP]
 
-DAO juror at dispute level 3.
+DAO juror at dispute Level 3. In bootstrap mode (M0), the single admin (`FOUNDATION_DAO_ADMIN_PUBKEY`) serves as the sole arbitrator.
 
-**Requirements:**
-- Elected via Governance Ticket
-- Staking deposit [PHASE 4]
+**Requirements (full Codex, Phase 4+):**
+- Elected via Governance Vote
+- HID Level 3 (Humanode biometric verification)
+- COLA stake
+
+**Bootstrap requirements (M0):**
+- Pubkey matches `FOUNDATION_DAO_ADMIN_PUBKEY`
+- `DaoMember.status = 'ACTIVE'`, `role ∈ {'ADMIN', 'ARBITRATOR'}`
 
 **Actions:**
-- Review all evidence and mediation protocol
-- Vote (majority decision, 3–5 arbitrators)
-- Verdict published as Nostr Event (public, immutable)
-- Lightning escrow split according to verdict
+- Review all evidence and mediation record
+- Issue verdict (RELEASE or CANCEL in M0; SPLIT deferred)
+- Verdict published as Nostr Kind 30022 (`sub_type: arbitration_verdict`)
+- Lightning escrow transition enforced via `verifyActor(ARBITRATOR)` in escrow router
 
 ---
 
@@ -106,3 +103,8 @@ Anyone not holding an active role in a transaction.
 A single user (pubkey) can hold different roles across different tickets:
 - Pubkey A is Initiator on Ticket 1, Partner on Ticket 2
 - No separate account needed — role is determined by ticket context
+
+
+---
+
+*Part of the Colabonate Protocol Specification | [docs/protocols/](../README.md)*

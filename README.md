@@ -2,10 +2,10 @@
 
 > An open protocol standard for decentralized trade and cooperation via Bitcoin Lightning.
 
-**Status:** `v0.1.0-draft` — Active development. Community input welcome. Not yet a finalized standard.
+**Status:** `v0.1.1-draft` — Active development. Community input welcome. Not yet a finalized standard.
 
-[![Specification Status](https://img.shields.io/badge/spec-v0.1.0--draft-yellow)](SPECIFICATION_STATUS.md)
-[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](LICENSE)
+[![Specification Status](https://img.shields.io/badge/spec-v0.1.1--draft-yellow)](SPECIFICATION_STATUS.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Bitcoin-only](https://img.shields.io/badge/Bitcoin-only-orange)](docs/decisions/007-protocol-documentation-bitcoin-only.md)
 
 ---
@@ -21,7 +21,7 @@ Anyone with a Lightning wallet can:
 - Build reputation through verifiable, non-transferable credentials
 - Participate in community governance via Nostr-based voting
 
-This repository contains the **protocol specification** and supporting documentation. It is maintained by the Colabonate Foundation and licensed under CC BY 4.0.
+This repository contains the **protocol specification** and supporting documentation. It is maintained by the Colabonate Foundation and licensed under the MIT License.
 
 **The goal of this repository:** Through open development and community review, reach `v1.0.0` — a stable, implementer-ready protocol standard.
 
@@ -46,18 +46,16 @@ This repository contains the **protocol specification** and supporting documenta
 
 ## Repository Structure
 
-```
-spec/                     ← Ratified protocol specifications (milestone-gated)
+```text
 docs/
-├── protocols/            ← Working drafts and conceptual foundation
-│   ├── core/             ← Core specs: events, escrow, reputation, identity
-│   ├── identity/         ← Identity and verification protocols
-│   ├── workflows/        ← Buyer, seller, cooperation, dispute flows
-│   └── governance/       ← DAO Codex, economics, roadmap
-└── decisions/            ← Architecture Decision Records (ADRs 007–012)
+├── protocols/            ← Protocol specifications
+│   ├── core/             ← Core specs: events, escrow, ticket system
+│   ├── identity/         | Identity and verification protocols
+│   ├── workflows/        | Buyer, seller, cooperation, dispute flows
+│   └── governance/       | DAO Codex, economics
 ```
 
-**`spec/`** contains specifications that have passed a milestone review and are considered stable enough for implementers to build against. **`docs/protocols/`** is the active working area — proposals, drafts, and concepts that feed into `spec/`.
+All protocol specifications live in `docs/protocols/`. Their individual maturity status (Draft vs Stable) is tracked within the documents themselves and in the global status table.
 
 See [SPECIFICATION_STATUS.md](SPECIFICATION_STATUS.md) for the current status of every document.
 
@@ -86,10 +84,10 @@ Full status table: [SPECIFICATION_STATUS.md](SPECIFICATION_STATUS.md)
 | Core | vision, roles, ticket-system, nostr-events, escrow | Draft |
 | Identity | identity-protocol | Draft |
 | Payments | payment-architecture | Draft |
-| Workflows | buy-protocol, sell-protocol | Draft (Phase 1 implemented) |
+| Workflows | buy-protocol, sell-protocol | Draft (Phase 1 core flow) |
 | Governance | dao-codex, economic-protocol, dao-creation-protocol | Draft |
 
-No document has yet passed a milestone review into `spec/`. This is the work of `v0.1.0` → `v1.0.0`.
+No document has yet reached `Stable` status. This is the goal of our current open development phase.
 
 ---
 
@@ -112,42 +110,7 @@ This protocol is developed in the open. You can follow and participate via:
 | `adr-needed` | Decision large enough to warrant an ADR |
 | `good-first-issue` | Well-defined, limited scope — good entry point |
 
-### Current Open Questions
 
-The following design questions are unresolved and block `v1.0.0`. Contributions welcome:
-
-| # | Question | Relevant Spec |
-|---|----------|--------------|
-| 1 | Spark Stablecoins denomination in escrow — exchange rate risk handling | [payment-architecture.md](docs/protocols/core/payment-architecture.md) |
-| 2 | Codex Fork RSK contract standard — interface definition | [payment-architecture.md](docs/protocols/core/payment-architecture.md) |
-| 3 | HID Linkage enforcement threshold — governance decision needed | [payment-architecture.md](docs/protocols/core/payment-architecture.md) |
-
-### Milestone Roadmap
-
-| Milestone | Goal | Criteria |
-|-----------|------|---------|
-| **v0.1.0-draft** | Public draft — community can read and comment | All core specs exist as drafts ✅ |
-| **v0.2.0** | Stable schemas — implementers can build Phase 1 clients | Nostr event schemas frozen, escrow state machine finalized |
-| **v0.3.0** | Identity + Reputation complete | Levels 0–3 fully specified, COL-Points formula finalized |
-| **v0.4.0** | Governance layer complete | DAO Codex ratified, economic-protocol finalized |
-| **v1.0.0** | Final standard | All open questions resolved, spec/ populated, community review complete |
-
----
-
-## Architecture Decisions (ADRs)
-
-Major protocol decisions are documented as Architecture Decision Records.
-
-| No. | Title | Status |
-|-----|-------|--------|
-| [007](docs/decisions/007-protocol-documentation-bitcoin-only.md) | Bitcoin-only protocol documentation | Accepted |
-| [008](docs/decisions/008-nostr-event-kind-range.md) | Nostr event kind range 30017–30026 | Accepted |
-| [009](docs/decisions/009-identity-level-model.md) | Identity level model (0–3) | Accepted |
-| [010](docs/decisions/010-lnbits-hold-invoice-escrow.md) | LNBits Hold Invoice as escrow | Accepted |
-| [011](docs/decisions/011-col-points-vs-cola-token.md) | COL-Points vs COLA token | Accepted |
-| [012](docs/decisions/012-payment-layer-architecture.md) | Payment layer architecture: L1 / Lightspark / RSK | Accepted |
-
-Full index and template: [docs/decisions/](docs/decisions/INDEX.md) | Next available: ADR 013
 
 ---
 
@@ -161,7 +124,7 @@ Colabonate uses a three-entity model (DFINITY-inspired):
 | **Colabonate DAO** | Community governance | [dao-codex.md](docs/protocols/governance/dao-codex.md) |
 | **Colabonate GmbH** | Commercial services | Separate repository |
 
-This repository is maintained by the **Colabonate Foundation** and freely available for any implementation under CC BY 4.0.
+This repository is maintained by the **Colabonate Foundation** and freely available for any implementation under the MIT License.
 
 ---
 
@@ -176,7 +139,6 @@ Contributions to the protocol specification are welcome. Please read [CONTRIBUTI
 | Fix a typo / clarification | Open a PR with label `editorial` |
 | Propose a spec change | Open an Issue with label `spec-proposal` first |
 | Raise an open question | Open an Issue with label `open-question` |
-| Major architecture decision | Open an Issue with label `adr-needed` |
 
 **Key rules:**
 - Bitcoin-only terminology (no EVM terms) — see [Glossary](docs/protocols/GLOSSARY.md)
@@ -189,9 +151,9 @@ Contributions to the protocol specification are welcome. Please read [CONTRIBUTI
 
 | Content | License |
 |---------|---------|
-| Protocol documentation | [CC BY 4.0](LICENSE) |
+| Protocol documentation | [MIT License](LICENSE) |
 
-The Colabonate Protocol specification is freely available for use, adaptation, and implementation. Attribution to the Colabonate Foundation is required.
+The Colabonate Protocol specification is freely available for use, adaptation, and implementation under the terms of the MIT License.
 
 ---
 

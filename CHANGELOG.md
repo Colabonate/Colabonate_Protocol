@@ -11,6 +11,20 @@ Format: [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH`
 
 ---
 
+## [0.1.1-draft] – 2026-04-24
+
+### Changed (Decoupling Reference Implementation)
+- **Protocol Separation:** The repository has been strictly refocused as a public, open standard for the "Freedom of Interaction on Bitcoin" (similar to Nostr NIPs).
+- **README.md & docs/protocols/README.md:** Rewritten to remove any mention of a specific "reference app". Status tags changed from `[IMPLEMENTED]` to protocol phases (`Phase 1`, `Stable`, etc.).
+- **SPECIFICATION_STATUS.md:** Updated workflow specifications to describe "Phase 1 core flow" instead of references to an implemented reference app.
+- **core/protocol-spec-v1.md:** Removed the Server API convenience layer section entirely, making the spec purely dependent on Nostr events and Lightning payments.
+- **core/compatibility-checklist.md:** Removed all references to server APIs and narrowed the checklist strictly to protocol compatibility.
+- **Removed:** Deleted `docs/protocols/core/openness-model.md` as it extensively documented the reference server app's internal database/API structure which is not applicable to a pure protocol standard repository.
+- **Removed:** Deleted `docs/GITHUB_PROJECT_SETUP.md` and `docs/GITHUB_PROJECT_SETTINGS.md` to align with the lightweight, decentralized approach of Nostr NIPs, removing rigid project board management in favor of a simpler PR-based discussion culture.
+- **License Update:** Changed repository license from CC BY 4.0 to the MIT License to maximize the openness and freedom of the standard.
+
+---
+
 ## [0.1.0-draft] – 2026-03-22
 
 ### Added (2026-03-22, Session 3 — Open Issues Resolution)

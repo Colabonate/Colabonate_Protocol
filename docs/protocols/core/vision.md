@@ -1,5 +1,7 @@
 # Vision – Colabonate
 
+**Normativity:** Descriptive
+
 **Date:** 2026-03-21
 **Status:** [IMPLEMENTED] Core marketplace | [ROADMAP] DAO, Governance
 
@@ -58,3 +60,8 @@ A marketplace where:
 - Freelancers and clients
 - Cooperation partners and project teams
 - Bitcoin / Lightning users who want to trade in a decentralized way
+
+
+---
+
+*Part of the Colabonate Protocol Specification | [docs/protocols/](../README.md)*

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_1"
+                  targetNamespace="http://colabonate.org/protocols/bpmn"
+                  exporter="Colabonate Protocol"
+                  exporterVersion="1.0.0">
+
+  <bpmn:process id="OrderProductFlow" name="Order Product Flow (PRODUCT OfferType)" isExecutable="false">
+
+    <!-- Start: Buyer clicks Buy Now -->
+    <bpmn:startEvent id="Start_BuyNow" name="Buyer clicks &#10;Buy Now">
+      <bpmn:outgoing>Flow_Browse</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Browse offers -->
+    <bpmn:task id="Task_BrowseOffers" name="Browse Offers">
+      <bpmn:incoming>Flow_Browse</bpmn:incoming>
+      <bpmn:outgoing>Flow_SelectOffer</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Select offer -->
+    <bpmn:task id="Task_SelectOffer" name="Select Offer">
+      <bpmn:incoming>Flow_SelectOffer</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreateTicket</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Create ticket (auto-accepted for PRODUCT) -->
+    <bpmn:serviceTask id="Task_CreateTicket" name="POST /api/tickets&#10;(auto-accepted)">
+      <bpmn:incoming>Flow_CreateTicket</bpmn:incoming>
+      <bpmn:outgoing>Flow_CheckStatus</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Gateway: Check status -->
+    <bpmn:exclusiveGateway id="Gateway_StatusCheck" name="Ticket Created?">
+      <bpmn:incoming>Flow_CheckStatus</bpmn:incoming>
+      <bpmn:outgoing>Flow_AutoAccept</bpmn:outgoing>
+      <bpmn:outgoing>Flow_CreateError</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Auto-accept (PRODUCT: no seller approval needed) -->
+    <bpmn:serviceTask id="Task_AutoAccept" name="Set Status:&#10;IN_PROGRESS">
+      <bpmn:incoming>Flow_AutoAccept</bpmn:incoming>
+      <bpmn:outgoing>Flow_Phase1Invoice</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Error: ticket creation failed -->
+    <bpmn:endEvent id="End_CreateError" name="Error:&#10;Ticket Creation Failed">
+      <bpmn:incoming>Flow_CreateError</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Phase 1: Create invoice (25% reservation) -->
+    <bpmn:serviceTask id="Task_Phase1Invoice" name="Phase 1 Invoice&#10;(25% reservation)">
+      <bpmn:incoming>Flow_Phase1Invoice</bpmn:incoming>
+      <bpmn:outgoing>Flow_BuyerPay1</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Buyer pays Phase 1 -->
+    <bpmn:userTask id="Task_BuyerPayPhase1" name="Buyer Pays&#10;Phase 1 (25%)">
+      <bpmn:incoming>Flow_BuyerPay1</bpmn:incoming>
+      <bpmn:outgoing>Flow_CheckPay1</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Gateway: Phase 1 paid? -->
+    <bpmn:exclusiveGateway id="Gateway_Pay1Check" name="Payment&#10;Received?">
+      <bpmn:incoming>Flow_CheckPay1</bpmn:incoming>
+      <bpmn:outgoing>Flow_EscrowHeld25</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Timeout1</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Escrow held 25% -->
+    <bpmn:serviceTask id="Task_Escrow25" name="Escrow: 25% HELD&#10;(Lightning HTLC)">
+      <bpmn:incoming>Flow_EscrowHeld25</bpmn:incoming>
+      <bpmn:outgoing>Flow_Deliver</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Timeout: Phase 1 -->
+    <bpmn:endEvent id="End_Timeout1" name="Timeout (72h)&#10;→ CANCELLED">
+      <bpmn:incoming>Flow_Timeout1</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Seller delivers product -->
+    <bpmn:userTask id="Task_DeliverProduct" name="Seller Delivers&#10;Product">
+      <bpmn:incoming>Flow_Deliver</bpmn:incoming>
+      <bpmn:outgoing>Flow_Phase2Invoice</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Phase 2: Invoice (50%) -->
+    <bpmn:serviceTask id="Task_Phase2Invoice" name="Phase 2 Invoice&#10;(50% delivery)">
+      <bpmn:incoming>Flow_Phase2Invoice</bpmn:incoming>
+      <bpmn:outgoing>Flow_BuyerPay2</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Buyer pays Phase 2 -->
+    <bpmn:userTask id="Task_BuyerPayPhase2" name="Buyer Pays&#10;Phase 2 (50%)">
+      <bpmn:incoming>Flow_BuyerPay2</bpmn:incoming>
+      <bpmn:outgoing>Flow_CheckPay2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Gateway: Phase 2 paid? -->
+    <bpmn:exclusiveGateway id="Gateway_Pay2Check" name="Payment&#10;Received?">
+      <bpmn:incoming>Flow_CheckPay2</bpmn:incoming>
+      <bpmn:outgoing>Flow_EscrowHeld75</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Timeout2</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Escrow held 75% -->
+    <bpmn:serviceTask id="Task_Escrow75" name="Escrow: 75% HELD&#10;(PARTIALLY_RELEASED)">
+      <bpmn:incoming>Flow_EscrowHeld75</bpmn:incoming>
+      <bpmn:outgoing>Flow_ConfirmReceipt</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Timeout: Phase 2 -->
+    <bpmn:endEvent id="End_Timeout2" name="Timeout&#10;→ CANCELLED">
+      <bpmn:incoming>Flow_Timeout2</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Buyer confirms receipt -->
+    <bpmn:userTask id="Task_ConfirmReceipt" name="Buyer Confirms&#10;Receipt">
+      <bpmn:incoming>Flow_ConfirmReceipt</bpmn:incoming>
+      <bpmn:outgoing>Flow_Phase3Invoice</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Phase 3: Invoice (25% quality) -->
+    <bpmn:serviceTask id="Task_Phase3Invoice" name="Phase 3 Invoice&#10;(25% quality)">
+      <bpmn:incoming>Flow_Phase3Invoice</bpmn:incoming>
+      <bpmn:outgoing>Flow_BuyerPay3</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Buyer pays Phase 3 -->
+    <bpmn:userTask id="Task_BuyerPayPhase3" name="Buyer Pays&#10;Phase 3 (25%)">
+      <bpmn:incoming>Flow_BuyerPay3</bpmn:incoming>
+      <bpmn:outgoing>Flow_CheckPay3</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Gateway: Phase 3 paid? -->
+    <bpmn:exclusiveGateway id="Gateway_Pay3Check" name="Payment&#10;Received?">
+      <bpmn:incoming>Flow_CheckPay3</bpmn:incoming>
+      <bpmn:outgoing>Flow_EscrowHeld100</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Timeout3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Escrow held 100% -->
+    <bpmn:serviceTask id="Task_Escrow100" name="Escrow: 100% HELD&#10;(DELIVERY_CONFIRMED)">
+      <bpmn:incoming>Flow_EscrowHeld100</bpmn:incoming>
+      <bpmn:outgoing>Flow_QualityConfirm</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Timeout: Phase 3 -->
+    <bpmn:endEvent id="End_Timeout3" name="Timeout (24h)&#10;→ CANCELLED">
+      <bpmn:incoming>Flow_Timeout3</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Quality confirmation or auto-release -->
+    <bpmn:userTask id="Task_QualityConfirm" name="Buyer Confirms&#10;Quality (48h)&#10;or auto-release">
+      <bpmn:incoming>Flow_QualityConfirm</bpmn:incoming>
+      <bpmn:outgoing>Flow_Release</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Release all funds to seller -->
+    <bpmn:serviceTask id="Task_Release" name="RELEASED&#10;(100% to seller)">
+      <bpmn:incoming>Flow_Release</bpmn:incoming>
+      <bpmn:outgoing>Flow_Review</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Review -->
+    <bpmn:userTask id="Task_Review" name="Review&#10;(Kind 30024)">
+      <bpmn:incoming>Flow_Review</bpmn:incoming>
+      <bpmn:outgoing>Flow_Completed</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- End: Completed -->
+    <bpmn:endEvent id="End_Completed" name="COMPLETED ✓">
+      <bpmn:incoming>Flow_Completed</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="Flow_Browse" sourceRef="Start_BuyNow" targetRef="Task_BrowseOffers" />
+    <bpmn:sequenceFlow id="Flow_SelectOffer" sourceRef="Task_BrowseOffers" targetRef="Task_SelectOffer" />
+    <bpmn:sequenceFlow id="Flow_CreateTicket" sourceRef="Task_SelectOffer" targetRef="Task_CreateTicket" />
+    <bpmn:sequenceFlow id="Flow_CheckStatus" sourceRef="Task_CreateTicket" targetRef="Gateway_StatusCheck" />
+    <bpmn:sequenceFlow id="Flow_AutoAccept" name="Success" sourceRef="Gateway_StatusCheck" targetRef="Task_AutoAccept" />
+    <bpmn:sequenceFlow id="Flow_CreateError" name="Error" sourceRef="Gateway_StatusCheck" targetRef="End_CreateError" />
+    <bpmn:sequenceFlow id="Flow_Phase1Invoice" sourceRef="Task_AutoAccept" targetRef="Task_Phase1Invoice" />
+    <bpmn:sequenceFlow id="Flow_BuyerPay1" sourceRef="Task_Phase1Invoice" targetRef="Task_BuyerPayPhase1" />
+    <bpmn:sequenceFlow id="Flow_CheckPay1" sourceRef="Task_BuyerPayPhase1" targetRef="Gateway_Pay1Check" />
+    <bpmn:sequenceFlow id="Flow_EscrowHeld25" name="Paid" sourceRef="Gateway_Pay1Check" targetRef="Task_Escrow25" />
+    <bpmn:sequenceFlow id="Flow_Timeout1" name="Timeout" sourceRef="Gateway_Pay1Check" targetRef="End_Timeout1" />
+    <bpmn:sequenceFlow id="Flow_Deliver" sourceRef="Task_Escrow25" targetRef="Task_DeliverProduct" />
+    <bpmn:sequenceFlow id="Flow_Phase2Invoice" sourceRef="Task_DeliverProduct" targetRef="Task_Phase2Invoice" />
+    <bpmn:sequenceFlow id="Flow_BuyerPay2" sourceRef="Task_Phase2Invoice" targetRef="Task_BuyerPayPhase2" />
+    <bpmn:sequenceFlow id="Flow_CheckPay2" sourceRef="Task_BuyerPayPhase2" targetRef="Gateway_Pay2Check" />
+    <bpmn:sequenceFlow id="Flow_EscrowHeld75" name="Paid" sourceRef="Gateway_Pay2Check" targetRef="Task_Escrow75" />
+    <bpmn:sequenceFlow id="Flow_Timeout2" name="Timeout" sourceRef="Gateway_Pay2Check" targetRef="End_Timeout2" />
+    <bpmn:sequenceFlow id="Flow_ConfirmReceipt" sourceRef="Task_Escrow75" targetRef="Task_ConfirmReceipt" />
+    <bpmn:sequenceFlow id="Flow_Phase3Invoice" sourceRef="Task_ConfirmReceipt" targetRef="Task_Phase3Invoice" />
+    <bpmn:sequenceFlow id="Flow_BuyerPay3" sourceRef="Task_Phase3Invoice" targetRef="Task_BuyerPayPhase3" />
+    <bpmn:sequenceFlow id="Flow_CheckPay3" sourceRef="Task_BuyerPayPhase3" targetRef="Gateway_Pay3Check" />
+    <bpmn:sequenceFlow id="Flow_EscrowHeld100" name="Paid" sourceRef="Gateway_Pay3Check" targetRef="Task_Escrow100" />
+    <bpmn:sequenceFlow id="Flow_Timeout3" name="Timeout" sourceRef="Gateway_Pay3Check" targetRef="End_Timeout3" />
+    <bpmn:sequenceFlow id="Flow_QualityConfirm" sourceRef="Task_Escrow100" targetRef="Task_QualityConfirm" />
+    <bpmn:sequenceFlow id="Flow_Release" sourceRef="Task_QualityConfirm" targetRef="Task_Release" />
+    <bpmn:sequenceFlow id="Flow_Review" sourceRef="Task_Release" targetRef="Task_Review" />
+    <bpmn:sequenceFlow id="Flow_Completed" sourceRef="Task_Review" targetRef="End_Completed" />
+
+    <!-- Lane: Buyer -->
+    <!-- Lane: Seller -->
+    <!-- Lane: Protocol (Auto) -->
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="OrderProductFlow">
+
+      <!-- Buyer Lane -->
+      <bpmndi:BPMNShape id="Lane_Buyer" bpmnElement="Lane_Buyer" isHorizontal="true">
+        <dc:Bounds x="160" y="0" width="900" height="200" />
+      </bpmndi:BPMNShape>
+
+      <!-- Seller Lane -->
+      <bpmndi:BPMNShape id="Lane_Seller" bpmnElement="Lane_Seller" isHorizontal="true">
+        <dc:Bounds x="160" y="200" width="900" height="200" />
+      </bpmndi:BPMNShape>
+
+      <!-- Protocol Lane -->
+      <bpmndi:BPMNShape id="Lane_Protocol" bpmnElement="Lane_Protocol" isHorizontal="true">
+        <dc:Bounds x="160" y="400" width="900" height="200" />
+      </bpmndi:BPMNShape>
+
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="Shape_Start_BuyNow" bpmnElement="Start_BuyNow">
+        <dc:Bounds x="200" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- End Events -->
+      <bpmndi:BPMNShape id="Shape_End_Completed" bpmnElement="End_Completed">
+        <dc:Bounds x="980" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_CreateError" bpmnElement="End_CreateError">
+        <dc:Bounds x="480" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Timeout1" bpmnElement="End_Timeout1">
+        <dc:Bounds x="580" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Timeout2" bpmnElement="End_Timeout2">
+        <dc:Bounds x="780" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Timeout3" bpmnElement="End_Timeout3">
+        <dc:Bounds x="940" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

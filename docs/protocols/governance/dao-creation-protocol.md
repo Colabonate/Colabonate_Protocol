@@ -268,7 +268,7 @@ A community DAO MAY reference the Foundation DAO Codex for dispute escalation (L
 - [docs/protocols/governance/economic-protocol.md](./economic-protocol.md) — COLA staking requirements
 - [docs/protocols/identity/identity-protocol.md](../identity/identity-protocol.md) — Level 2 requirement
 - [docs/protocols/core/nostr-events.md](../core/nostr-events.md) — Kind 30022 (governance/DAO events)
-- [ADR 009: Identity Level Model](../../decisions/009-identity-level-model.md)
+- [ADR 010: Identity Level Model](../../decisions/010-identity-level-model.md)
 
 ---
 

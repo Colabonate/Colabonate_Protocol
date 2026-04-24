@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_3"
+                  targetNamespace="http://colabonate.org/protocols/bpmn"
+                  exporter="Colabonate Protocol"
+                  exporterVersion="1.0.0">
+
+  <bpmn:process id="MilestoneServiceFlow" name="Milestone-based Service Delivery" isExecutable="false">
+
+    <!-- ========== START ========== -->
+    <bpmn:startEvent id="Start_Initiate" name="Cooperation&#10;Initiated">
+      <bpmn:outgoing>Flow_Describe</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Phase A: Initiation and Matching -->
+    <bpmn:userTask id="Task_DescribeGoal" name="Initiator Describes&#10;Cooperation Goal">
+      <bpmn:incoming>Flow_Describe</bpmn:incoming>
+      <bpmn:outgoing>Flow_Publish</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_PublishNostr" name="Publish via Nostr&#10;(Kind 30018)">
+      <bpmn:incoming>Flow_Publish</bpmn:incoming>
+      <bpmn:outgoing>Flow_PartnerResponds</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_PartnerResponse" name="Partner Responds&#10;(interest / counter-offer)">
+      <bpmn:incoming>Flow_PartnerResponds</bpmn:incoming>
+      <bpmn:outgoing>Flow_AgreeTerms</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_AgreeTerms" name="Both Parties&#10;Agree on Terms">
+      <bpmn:incoming>Flow_AgreeTerms</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreateMilestoneTicket</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Phase B: Contract Formation -->
+    <bpmn:serviceTask id="Task_CreateMilestoneTicket" name="POST /api/tickets&#10;ticketType: MILESTONE">
+      <bpmn:incoming>Flow_CreateMilestoneTicket</bpmn:incoming>
+      <bpmn:outgoing>Flow_DefineMilestones</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_DefineMilestones" name="Define Milestones&#10;(title, description,&#10;dueDate, amountSats)">
+      <bpmn:incoming>Flow_DefineMilestones</bpmn:incoming>
+      <bpmn:outgoing>Flow_SignNostr</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_PartnerSigns" name="Partner Signs&#10;(Nostr Event)">
+      <bpmn:incoming>Flow_SignNostr</bpmn:incoming>
+      <bpmn:outgoing>Flow_EscrowDeposit</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:serviceTask id="Task_EscrowDeposit" name="Escrow Deposit&#10;(Full Amount,&#10;Hold Invoice)">
+      <bpmn:incoming>Flow_EscrowDeposit</bpmn:incoming>
+      <bpmn:outgoing>Flow_FirstMilestone</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- ========== MILESTONE LOOP (with Multi-Instance Marker) ========== -->
+
+    <!-- Start milestone loop -->
+    <bpmn:subProcess id="SubProcess_MilestoneLoop" name="Milestone Loop" isTriggeredByEvent="false">
+
+      <bpmn:startEvent id="Start_Milestone" name="Next Milestone">
+        <bpmn:outgoing>Flow_MS_SetInProgress</bpmn:outgoing>
+      </bpmn:startEvent>
+
+      <bpmn:serviceTask id="Task_MS_InProgress" name="Milestone Status:&#10;IN_PROGRESS">
+        <bpmn:incoming>Flow_MS_SetInProgress</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Work</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:userTask id="Task_MS_DoWork" name="Partner Executes&#10;Milestone Work">
+        <bpmn:incoming>Flow_MS_Work</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Report</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_MS_Report" name="Partner Reports&#10;Completion + Evidence">
+        <bpmn:incoming>Flow_MS_Report</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Review</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_MS_Review" name="Initiator Reviews&#10;and Confirms">
+        <bpmn:incoming>Flow_MS_Review</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Gateway</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:exclusiveGateway id="Gateway_MS_Approval" name="Milestone&#10;Approved?">
+        <bpmn:incoming>Flow_MS_Gateway</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Release</bpmn:outgoing>
+        <bpmn:outgoing>Flow_MS_Reject</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <bpmn:serviceTask id="Task_MS_Release" name="Partial Payment&#10;Released (proportional)">
+        <bpmn:incoming>Flow_MS_Release</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Complete</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:serviceTask id="Task_MS_SetComplete" name="Milestone Status:&#10;COMPLETED">
+        <bpmn:incoming>Flow_MS_Complete</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_MoreCheck</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:exclusiveGateway id="Gateway_MS_More" name="More&#10;Milestones?">
+        <bpmn:incoming>Flow_MS_MoreCheck</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_Next</bpmn:outgoing>
+        <bpmn:outgoing>Flow_MS_AllDone</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <!-- Dispute from milestone -->
+      <bpmn:boundaryEvent id="Event_MS_Dispute" name="Dispute" attachedToRef="Task_MS_Review">
+        <bpmn:outgoing>Flow_MS_DisputeFlow</bpmn:outgoing>
+      </bpmn:boundaryEvent>
+
+      <bpmn:endEvent id="End_MS_Disputed" name="DISPUTED">
+        <bpmn:incoming>Flow_MS_DisputeFlow</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <!-- Rejection: send back to work -->
+      <bpmn:serviceTask id="Task_MS_SendBack" name="Request Revisions">
+        <bpmn:incoming>Flow_MS_Reject</bpmn:incoming>
+        <bpmn:outgoing>Flow_MS_ReWork</bpmn:outgoing>
+      </bpmn:serviceTask>
+
+      <bpmn:endEvent id="End_MilestoneLoop" name="All Milestones&#10;Complete">
+        <bpmn:incoming>Flow_MS_AllDone</bpmn:outgoing>
+      </bpmn:endEvent>
+
+      <!-- Loop back -->
+      <bpmn:sequenceFlow id="Flow_MS_Next" name="Yes" sourceRef="Gateway_MS_More" targetRef="Start_Milestone" />
+
+      <!-- Flows -->
+      <bpmn:sequenceFlow id="Flow_MS_SetInProgress" sourceRef="Start_Milestone" targetRef="Task_MS_InProgress" />
+      <bpmn:sequenceFlow id="Flow_MS_Work" sourceRef="Task_MS_InProgress" targetRef="Task_MS_DoWork" />
+      <bpmn:sequenceFlow id="Flow_MS_Report" sourceRef="Task_MS_DoWork" targetRef="Task_MS_Report" />
+      <bpmn:sequenceFlow id="Flow_MS_Review" sourceRef="Task_MS_Report" targetRef="Task_MS_Review" />
+      <bpmn:sequenceFlow id="Flow_MS_Gateway" sourceRef="Task_MS_Review" targetRef="Gateway_MS_Approval" />
+      <bpmn:sequenceFlow id="Flow_MS_Release" name="Approved" sourceRef="Gateway_MS_Approval" targetRef="Task_MS_Release" />
+      <bpmn:sequenceFlow id="Flow_MS_Reject" name="Revisions" sourceRef="Gateway_MS_Approval" targetRef="Task_MS_SendBack" />
+      <bpmn:sequenceFlow id="Flow_MS_Complete" sourceRef="Task_MS_Release" targetRef="Task_MS_SetComplete" />
+      <bpmn:sequenceFlow id="Flow_MS_MoreCheck" sourceRef="Task_MS_SetComplete" targetRef="Gateway_MS_More" />
+      <bpmn:sequenceFlow id="Flow_MS_AllDone" name="No" sourceRef="Gateway_MS_More" targetRef="End_MilestoneLoop" />
+      <bpmn:sequenceFlow id="Flow_MS_DisputeFlow" sourceRef="Event_MS_Dispute" targetRef="End_MS_Disputed" />
+      <bpmn:sequenceFlow id="Flow_MS_ReWork" sourceRef="Task_MS_SendBack" targetRef="Task_MS_DoWork" />
+
+    </bpmn:subProcess>
+
+    <bpmn:sequenceFlow id="Flow_FirstMilestone" sourceRef="Task_EscrowDeposit" targetRef="SubProcess_MilestoneLoop" />
+
+    <!-- ========== Phase D: Completion and Reputation ========== -->
+    <bpmn:serviceTask id="Task_TicketComplete" name="Ticket Status:&#10;COMPLETED">
+      <bpmn:incoming>Flow_MilestoneLoopDone</bpmn:incoming>
+      <bpmn:outgoing>Flow_MutualReview</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_MutualReview" name="Mutual Reviews&#10;(Kind 30024 Soulbound)">
+      <bpmn:incoming>Flow_MutualReview</bpmn:incoming>
+      <bpmn:outgoing>Flow_ReputationBound</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_Reputation" name="Reputation Bound&#10;to Pubkeys">
+      <bpmn:incoming>Flow_ReputationBound</bpmn:incoming>
+      <bpmn:outgoing>Flow_Done</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_Completed" name="Cooperation&#10;COMPLETED ✓">
+      <bpmn:incoming>Flow_Done</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Dispute at ticket level -->
+    <bpmn:boundaryEvent id="Event_TicketDispute" name="Dispute Raised" attachedToRef="SubProcess_MilestoneLoop">
+      <bpmn:outgoing>Flow_TicketDispute</bpmn:outgoing>
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="End_Disputed" name="DISPUTED&#10;(→ Dispute Protocol)">
+      <bpmn:incoming>Flow_TicketDispute</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows (main process) -->
+    <bpmn:sequenceFlow id="Flow_Describe" sourceRef="Start_Initiate" targetRef="Task_DescribeGoal" />
+    <bpmn:sequenceFlow id="Flow_Publish" sourceRef="Task_DescribeGoal" targetRef="Task_PublishNostr" />
+    <bpmn:sequenceFlow id="Flow_PartnerResponds" sourceRef="Task_PublishNostr" targetRef="Task_PartnerResponse" />
+    <bpmn:sequenceFlow id="Flow_AgreeTerms" sourceRef="Task_PartnerResponse" targetRef="Task_AgreeTerms" />
+    <bpmn:sequenceFlow id="Flow_CreateMilestoneTicket" sourceRef="Task_AgreeTerms" targetRef="Task_CreateMilestoneTicket" />
+    <bpmn:sequenceFlow id="Flow_DefineMilestones" sourceRef="Task_CreateMilestoneTicket" targetRef="Task_DefineMilestones" />
+    <bpmn:sequenceFlow id="Flow_SignNostr" sourceRef="Task_DefineMilestones" targetRef="Task_PartnerSigns" />
+    <bpmn:sequenceFlow id="Flow_EscrowDeposit" sourceRef="Task_PartnerSigns" targetRef="Task_EscrowDeposit" />
+    <bpmn:sequenceFlow id="Flow_MilestoneLoopDone" sourceRef="SubProcess_MilestoneLoop" targetRef="Task_TicketComplete" />
+    <bpmn:sequenceFlow id="Flow_MutualReview" sourceRef="Task_TicketComplete" targetRef="Task_MutualReview" />
+    <bpmn:sequenceFlow id="Flow_ReputationBound" sourceRef="Task_MutualReview" targetRef="Task_Reputation" />
+    <bpmn:sequenceFlow id="Flow_Done" sourceRef="Task_Reputation" targetRef="End_Completed" />
+    <bpmn:sequenceFlow id="Flow_TicketDispute" sourceRef="Event_TicketDispute" targetRef="End_Disputed" />
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_3">
+    <bpmndi:BPMNPlane id="BPMNPlane_3" bpmnElement="MilestoneServiceFlow">
+      <bpmndi:BPMNShape id="Shape_Start_Initiate" bpmnElement="Start_Initiate">
+        <dc:Bounds x="160" y="240" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SubProcess" bpmnElement="SubProcess_MilestoneLoop" isExpanded="false">
+        <dc:Bounds x="620" y="180" width="300" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Completed" bpmnElement="End_Completed">
+        <dc:Bounds x="1120" y="240" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Disputed" bpmnElement="End_Disputed">
+        <dc:Bounds x="740" y="380" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

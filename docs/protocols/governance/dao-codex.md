@@ -42,13 +42,13 @@ Three voting models are available. The DAO selects the applicable model per prop
 - Each verified human receives exactly one HID (Human Identity Level 3)
 - HID is non-transferable — bound to a biometric signature on-device
 - Prevents: multiple accounts, bot networks, sock puppets
-- Verification procedure: see [identity-protocol.md](../identity/identity-protocol.md#identity-level-3)
+- Verification procedure: see [identity-protocol.md](../identity/identity-protocol.md#level-3-hid-verified-humanode-biomapper)
 
 **COLA Token (Phase 4):**
 - RRC-20 governance token on RSK (Bitcoin sidechain — not Ethereum)
 - Staking enables token-weighted governance participation and 5% APY yield
 - Full specification: [economic-protocol.md](./economic-protocol.md)
-- Stake event schema: Nostr Kind 30025 — see [nostr-events.md](../core/nostr-events.md#kind-30025)
+- Stake event schema: Nostr Kind 30025 — see [nostr-events.md](../core/nostr-events.md#kind-30025-cola-token-stake-event)
 
 ### I.2 Proposal Types and Voting Model Selection
 
@@ -78,7 +78,7 @@ Quorum is measured as a percentage of active pubkeys (at least 1 COMPLETED ticke
 5. Result published as a final Kind 30022 event (immutable, signed by DAO operator pubkey)
 ```
 
-Vote event schema: see [nostr-events.md](../core/nostr-events.md#kind-30022)
+Vote event schema: see [nostr-events.md](../core/nostr-events.md#kind-30022-governance-vote)
 
 ### I.4 Delegation (Liquid Democracy) [PHASE 4+]
 
@@ -112,7 +112,7 @@ Vote event schema: see [nostr-events.md](../core/nostr-events.md#kind-30022)
 
 Full specification: [dispute-protocol.md](../workflows/dispute-protocol.md)
 
-Escrow impact: DAO Court verdicts are published as Kind 30019 events with `escrow_action` tag, triggering Lightning escrow settlement. See [escrow-protocol.md](../core/escrow-protocol.md#dispute-to-escrow-verdict-mapping).
+Escrow impact: DAO Court verdicts are published as Kind 30019 events with `escrow_action` tag, triggering Lightning escrow settlement. See [escrow-protocol.md](../core/escrow-protocol.md#dispute-verdict-to-escrow-mapping).
 
 ### II.2 Sanctions
 
@@ -216,7 +216,92 @@ Community members can publish their own workflow protocols:
 - Successful protocols become standard templates in the Protocol Registry
 - Protocol authors can attach Royalty Tickets (sat-denominated, per-use fee)
 - Open-source and premium models both supported
-- Registry specification: [governance-roadmap.md](./governance-roadmap.md#phase-5)
+- Registry specification: [governance-roadmap.md](./governance-roadmap.md#phase-5-workflow-editor-and-protocol-marketplace)
+
+---
+
+## Appendix A — Foundation DAO Operation (ADR-125 + ADR-126)
+
+**Status:** `[ACTIVE]` — Multi-member operation (M2), 2026-Q2
+
+This appendix documents the operational state of the Foundation DAO. Appendix A.1 covers bootstrap history. Appendix A.2 covers the M2 upgrade.
+
+### A.1 Bootstrap Mode History (M0)
+
+The bootstrap phase (v0.1) was a reduced-capability operation activated to enable Level 3 dispute resolution before full Phase 4 criteria were met.
+
+**Entry:** `FOUNDATION_DAO_ADMIN_PUBKEY` env var set at server boot.
+**Exit:** M2 multi-member quorum activated (2026-04-17).
+
+### A.2 M2 Upgrade (2026-Q2) — Multi-Member Operation
+
+The M2 upgrade (ADR-126) lifted the Council from single-admin bootstrap to a multi-member quorum body.
+
+**What changed:**
+- Member lifecycle: invite (PENDING) → sign Kind 30021 → accept (ACTIVE); revoke path with Kind 5
+- Quorum aggregation: verdict persisted immediately; escrow fires only on quorum threshold
+- NIP-07 challenge auth: admin writes gated by signed challenge
+- Public audit trail: all submitted verdicts visible including dissent
+
+**What did NOT change (deferred):**
+- SPLIT verdict outcome (post-M2)
+- HID Level 3 biometric gate (Phase 3)
+- COLA staking + arbitrator fee (Phase 4)
+- Multi-admin governance (M3)
+- Rotating arbitrator assignment (M3)
+
+**Quorum types available:**
+| Type | Behavior |
+|------|----------|
+| `SINGLE` | Any single verdict resolves (backward-compatible with M0) |
+| `MAJORITY` | >50% of active arbitrators required |
+| `THRESHOLD` | Exactly N verdicts required |
+
+### A.3 Differences from Full Codex Operation
+
+| Aspect | Full Codex (ACTIVE) | M2 Operation |
+|--------|--------------------|---------------|
+| Arbitrators | HID Level 3 required (1P1V) | ADMIN + ARBITRATOR roles, NIP-07 credential |
+| Voting model | 1P1V (HID) or token-weighted | 1P1V bypass — HID not enforced |
+| Mediator (Level 2) | Required before Level 3 | Skipped — L1 → L3 directly |
+| Quorum | Configurable (MAJORITY/THRESHOLD) | Configurable: SINGLE/MAJORITY/THRESHOLD |
+| Verdict outcomes | RELEASE, CANCEL, SPLIT | RELEASE, CANCEL only |
+| Arbitrator fee | 2% per Codex III.3 | Pro bono (no fee mechanic) |
+
+### A.4 M2 Operational Notes
+
+- **Tie-break:** Admin has decisive vote on ties in M2 (removed in M3)
+- **Invite delivery:** Email out-of-band (Nostr DM reconsidered in M3)
+- **Verdict immutability:** Verdicts are immutable once submitted; corrections via Phase 4 Appeal
+- **Kind 5 revocation:** Admin publishes Kind 5 to revoke member's Kind 30021 credential
+- **Config snapshot:** Quorum config captured at escalation; in-flight disputes continue under snapshot
+
+### A.5 Upgrade Path
+
+1. **M2 (implemented):** Admin invites arbitrators → quorum activates → audit trail public
+2. **Phase 3:** Humanode HID integration → 1P1V enforcement → Level 2 mediator pool starts
+3. **Phase 4:** COLA token staking → token-weighted votes → arbitrator compensation → SPLIT outcome
+
+### A.6 Codex Hash
+
+The `codexHash` field in all DAO records is the SHA-256 hash of the UTF-8 bytes of this file (`dao-codex.md`), computed at seed time. It is used as the binding reference for ticket disputes.
+
+Current value (v1.0.0-draft): `a90dd4f5da3d123f1953535928ed55ab86a060c6f86f416916286dc223a95c70`
+
+*Update this value whenever the Codex is amended.*
+
+### A.7 Arbitration Rubric Reference
+
+The Arbitration Rubric is the decision framework for Council verdicts. It is advisory — arbitrators retain discretion and must justify deviations in verdict reasoning.
+
+**Current version:** 1.0.0 (published 2026-04-17)
+
+**SHA-256 content hash:** `1f37384662a2dde34cda2b32fdb34939b04ba5c1f7ee4424bee3fb47c1ae20e9`
+
+The hash is computed over the UTF-8 bytes of `arbitration-rubric.md`. Changes to the rubric require a version bump, a new hash, and an ADR.
+
+**Location:** [arbitration-rubric.md](./arbitration-rubric.md)
+**Onboarding:** [role-onboarding.md](./role-onboarding.md)
 
 ---
 
@@ -231,7 +316,7 @@ Community members can publish their own workflow protocols:
 - [docs/protocols/governance/governance-roadmap.md](./governance-roadmap.md) — Phase-by-phase roadmap
 - [docs/protocols/workflows/dispute-protocol.md](../workflows/dispute-protocol.md) — Dispute resolution
 - [docs/protocols/core/nostr-events.md](../core/nostr-events.md) — Event schemas (Kind 30022, 30025)
-- [ADR 011: COL-Points vs COLA Token](../../decisions/011-col-points-vs-cola-token.md)
+- [ADR 012: COL-Points vs COLA Token](../../decisions/012-col-points-vs-cola-token.md)
 
 ---
 

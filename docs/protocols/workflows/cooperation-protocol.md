@@ -1,6 +1,8 @@
 # Cooperation Protocol
 
-**Status:** [PHASE 2] — Concept finalized, schema extensions defined, not yet implemented
+**Normativity:** Mixed
+
+**Status:** [IMPLEMENTED] NIP-C Protocol Layer (ADR-108, 109, 113, 119) | UI + Simulator complete
 
 ## Purpose
 
@@ -156,3 +158,8 @@ The difference lies in the social context:
 2. **Simple services** — e.g. "Math tutoring", "Bike repair"
 3. **Small projects** — 2–3 milestones, manageable budget
 4. **Complex cooperations** — multiple partners, governance elements
+
+
+---
+
+*Part of the Colabonate Protocol Specification | [docs/protocols/](../README.md)*

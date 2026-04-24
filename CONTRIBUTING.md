@@ -71,10 +71,13 @@ Use consistent status tags in all documents:
 
 | Tag | Meaning |
 |-----|-----------|
-| `[IMPLEMENTED]` | Implemented in code |
-| `[PHASE 2]` | Designed, not in code yet |
-| `[ROADMAP]` | Concept exists, timeline open |
-| `[CONCEPT]` | Idea, not yet fully specified |
+| `Phase 1` | Core protocol specification |
+| `Phase 2` | Extension protocol specification |
+| `Phase 3` | Advanced identity and reputation |
+| `Phase 4` | Governance and conflict resolution |
+| `Roadmap` | Concept exists, timeline open |
+| `Draft` | Active working document |
+| `Stable` | Ready for implementation |
 
 ## Communication
 
@@ -89,4 +92,4 @@ See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## License
 
-By contributing, you agree to the [CC BY 4.0](LICENSE) license.
+By contributing, you agree to the [MIT License](LICENSE) license.

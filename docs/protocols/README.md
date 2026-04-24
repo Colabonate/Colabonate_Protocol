@@ -1,6 +1,6 @@
 # Colabonate – Protocol Documentation
 
-This directory contains the complete protocol specification for Colabonate. Documents describe the *what* and *why* of the protocol — not the app implementation.
+This directory contains the complete protocol specification for Colabonate. Documents describe the *what* and *why* of the protocol as an open standard for the freedom of interaction on Bitcoin — completely separated from any specific implementation.
 
 ---
 
@@ -80,18 +80,18 @@ This directory contains the complete protocol specification for Colabonate. Docu
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [buy-protocol.md](workflows/buy-protocol.md) | [IMPLEMENTED] Phase 1 | Buyer flow |
-| [sell-protocol.md](workflows/sell-protocol.md) | [IMPLEMENTED] Phase 1 | Seller flow |
-| [cooperation-protocol.md](workflows/cooperation-protocol.md) | [PHASE 2] | Multi-party cooperation |
-| [dispute-protocol.md](workflows/dispute-protocol.md) | [PHASE 4] | Conflict resolution |
+| [buy-protocol.md](workflows/buy-protocol.md) | Phase 1 | Buyer flow |
+| [sell-protocol.md](workflows/sell-protocol.md) | Phase 1 | Seller flow |
+| [cooperation-protocol.md](workflows/cooperation-protocol.md) | Phase 2 | Multi-party cooperation |
+| [dispute-protocol.md](workflows/dispute-protocol.md) | Phase 4 | Conflict resolution |
 
 ### governance/
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [dao-codex.md](governance/dao-codex.md) | [ROADMAP] | Foundation DAO constitution |
-| [dao-creation-protocol.md](governance/dao-creation-protocol.md) | [PHASE 4] | User-created DAOs |
-| [economic-protocol.md](governance/economic-protocol.md) | [PHASE 4] | COLA token and fees |
+| [dao-codex.md](governance/dao-codex.md) | Roadmap | Foundation DAO constitution |
+| [dao-creation-protocol.md](governance/dao-creation-protocol.md) | Phase 4 | User-created DAOs |
+| [economic-protocol.md](governance/economic-protocol.md) | Phase 4 | COLA token and fees |
 | [governance-roadmap.md](governance/governance-roadmap.md) | Living | Phase-by-phase roadmap |
 
 ---
@@ -102,12 +102,13 @@ All documents use consistent status tags:
 
 | Tag | Meaning |
 |-----|---------|
-| `[IMPLEMENTED]` | Implemented in the reference application |
-| `[PHASE 2]` | Designed, planned for Phase 2 implementation |
-| `[PHASE 3]` | Designed, planned for Phase 3 |
-| `[PHASE 4]` | Designed, planned for Phase 4 |
-| `[ROADMAP]` | Concept exists, timeline open |
-| `[CONCEPT]` | Idea, not yet fully specified |
+| `Phase 1` | Core protocol specification |
+| `Phase 2` | Extension protocol specification |
+| `Phase 3` | Advanced identity and reputation |
+| `Phase 4` | Governance and conflict resolution |
+| `Roadmap` | Concept exists, timeline open |
+| `Draft` | Active working document |
+| `Stable` | Ready for implementation |
 
 ---
 

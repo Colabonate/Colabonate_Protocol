@@ -1,5 +1,7 @@
 # Protocol Spec v1 – Colabonate Technical Specification
 
+**Normativity:** Descriptive
+
 **Version:** 1.0.0-draft
 **Date:** 2026-03-22
 **Status:** [IMPLEMENTED] Authentication + Marketplace | [PHASE 2] Escrow + Lightspark | [PHASE 4] RSK + Dispute
@@ -100,16 +102,7 @@ The resulting `pubkey` is the user's permanent pseudonymous identifier across al
 
 ## Marketplace [IMPLEMENTED]
 
-Offers are published as Nostr Kind 30017 events and stored locally:
-
-```
-POST /api/offers
-  1. Create offer in local storage
-  2. Publish Kind 30017 event to Nostr relay
-  3. Store nostrEventId reference
-
-On Nostr publish error: logged, offer still saved, nostrEventId stays null
-```
+Offers are published as Nostr Kind 30017 events.
 
 **Nostr Event format** (Kind 30017 — see [nostr-events.md](./nostr-events.md) for full schema):
 
@@ -141,16 +134,14 @@ Optional for Phase 2+ offers with Spark Stablecoin pricing:
 ### Phase 1 (Implemented) — Single Invoice
 
 ```
-POST /api/tickets { buyerPubkey, offerId, amountSats }
-  → Lightning invoice generated (LNBits or mock BOLT11)
+Buyer requests ticket creation -> Lightning invoice generated (LNBits or mock BOLT11)
   → Status: PENDING
 
 Buyer pays invoice in Lightning wallet
-  → Webhook: POST /api/lightning/webhook
   → Status: IN_PROGRESS
 
 Completion:
-  → PATCH /api/tickets/:id { status: "COMPLETED" }
+  → Status: COMPLETED
 ```
 
 ### Phase 2 (Planned) — Three-Phase Escrow via Lightspark Grid
@@ -178,15 +169,21 @@ Complete schemas in [nostr-events.md](./nostr-events.md). Summary:
 | Kind | Usage | Status |
 |------|-------|--------|
 | 30017 | Offer (marketplace listing) | IMPLEMENTED |
-| 30018 | Ticket created | PHASE 2 |
-| 30019 | Ticket status update | PHASE 2 |
-| 30020 | Dispute opened | PHASE 4 |
-| 30021 | Verification credential (Soulbound) | PHASE 3 |
-| 30022 | Governance vote / DAO event | PHASE 4+ |
+| 30018 | Ticket created (legacy, dual-published) | IMPLEMENTED (as 30407) |
+| 30019 | Ticket status update (legacy, dual-published) | IMPLEMENTED (as 30408) |
+| 30020 | Dispute opened | IMPLEMENTED (M0 bootstrap) |
+| 30021 | Verification credential (Soulbound) | IMPLEMENTED (arbitrator) / PHASE 3 (identity) |
+| 30022 | Governance vote / DAO event | IMPLEMENTED (ADR-128) |
 | 30023 | HID attestation (Humanode) | PHASE 3 |
-| 30024 | COL-Points / reputation review | PHASE 3 |
+| 30024 | COL-Points / reputation review | IMPLEMENTED |
 | 30025 | COLA Token stake event | PHASE 4 |
 | 30026 | Proximity Proof (peer verification) | PHASE 3 |
+| 30027 | Company Profile | IMPLEMENTED |
+| 30414 | Cooperation Proposal (NIP-C) | IMPLEMENTED |
+| 30415 | Milestone Event (NIP-C) | IMPLEMENTED |
+| 30420 | DAO Governance Proposal | IMPLEMENTED (ADR-128) |
+| 30421 | DAO Governance Vote | IMPLEMENTED (ADR-128) |
+| 30422 | DAO Proposal Outcome | IMPLEMENTED (ADR-128) |
 
 NIP-57 (Lightning Zaps) is also supported via Lightspark Grid in Phase 2 for tipping and micro-rewards.
 
@@ -205,39 +202,7 @@ NIP-57 (Lightning Zaps) is also supported via Lightspark Grid in Phase 2 for tip
 
 ---
 
-## API Overview [IMPLEMENTED]
 
-```
-# Auth
-GET    /api/auth/lnurl              Generate LNURL challenge (k1)
-GET    /api/auth/lnurl/callback     Verify Schnorr signature
-GET    /api/auth/lnurl/status/:k1   Poll auth status
-
-# Offers
-GET    /api/offers                  List active offers
-POST   /api/offers                  Create offer (+ Nostr Kind 30017 publish)
-GET    /api/offers/:id              Offer details
-# BACKLOG: PATCH /api/offers/:id   Close offer — Phase 1 backlog
-
-# Tickets
-POST   /api/tickets                 Create ticket (+ Lightning invoice)
-GET    /api/tickets?pubkey=...      Get tickets for a pubkey
-GET    /api/tickets/:id             Ticket details
-PATCH  /api/tickets/:id             Update status
-GET    /api/tickets/:id/payment-status  Payment polling
-
-# Lightning
-POST   /api/lightning/invoice       Create invoice
-GET    /api/lightning/invoice/:hash Invoice status
-POST   /api/lightning/webhook       Payment confirmation callback
-
-# Nostr
-GET    /api/nostr/test              Test relay connection
-GET    /api/nostr/offers/:pubkey    Get seller's offers via Nostr
-POST   /api/nostr/offers            Manually publish offer
-```
-
----
 
 ## Protocol Versioning
 
@@ -249,8 +214,7 @@ The protocol version is declared in Nostr Kind 0 profile metadata:
 }
 ```
 
-Breaking changes (Nostr schema changes) → major version bump.
-See [protocol-versioning.md](./protocol-versioning.md) (planned).
+Breaking changes (Nostr schema changes) → major version bump. Full versioning policy (semver rules, deprecation windows, CHANGELOG location) is specified inline in this document (see the `Versioning` section above) and tracked in [CHANGELOG.md](../CHANGELOG.md).
 
 ---
 
@@ -258,8 +222,11 @@ See [protocol-versioning.md](./protocol-versioning.md) (planned).
 
 | Gap | Impact | Resolution |
 |-----|--------|-----------|
-| `PATCH /api/offers/:id` missing | Offers cannot be closed by seller | Phase 1 backlog |
-| `ACCEPTED` status not active | Seller acceptance not tracked | Phase 2 (with escrow) |
 | No push notifications | Seller not notified of new tickets | Phase 2 |
 | No Lightspark integration | Using LNBits mock only | Phase 2 |
 | No HID enforcement | All transactions anonymous | Phase 3 (opt-in), Phase 4 (enforced) |
+
+
+---
+
+*Part of the Colabonate Protocol Specification | [docs/protocols/](../README.md)*

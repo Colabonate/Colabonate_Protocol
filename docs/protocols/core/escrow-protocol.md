@@ -1,5 +1,7 @@
 # Escrow Protocol – Lightning Escrow for Trustless Trade
 
+**Normativity:** Normative
+
 **Version:** 1.0.0-draft
 **Date:** 2026-03-22
 **Status:** [PHASE 2] Escrow | [IMPLEMENTED] Phase 1 single invoice
@@ -292,8 +294,6 @@ For use cases requiring complex conditional logic not expressible with Hold Invo
 
 The following items are known gaps in the current Phase 1 implementation that must be resolved before Phase 2 escrow:
 
-- [ ] PATCH /api/offers/:id — offer close endpoint missing
-- [ ] ACCEPTED status not yet activated (seller acceptance is not tracked in Phase 1)
 - [ ] Phase 1 dispute flow needs webhook-compatible conflict registration
 
 ---

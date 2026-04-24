@@ -1,5 +1,7 @@
 # Sell Protocol
 
+**Normativity:** Mixed
+
 **Status:** [IMPLEMENTED] Base flow | [PHASE 2] Notifications, offer-close, escrow
 **Affects:** `POST /api/offers`, `GET /api/offers`, `PATCH /api/tickets/:id`
 
@@ -52,12 +54,9 @@ an offer to completing a transaction.
 
 ```
 ACTIVE
-  └─► CLOSED    (seller closes manually)   ← PATCH /api/offers/:id missing
+  └─► CLOSED    (seller closes manually)
   └─► ARCHIVED  (admin / timeout)          ← not implemented
 ```
-
-> **Phase 1 Backlog:** `PATCH /api/offers/:id { status: "CLOSED" }` is missing.
-> Offers cannot currently be closed manually.
 
 ---
 
@@ -106,3 +105,8 @@ POST /api/nostr/offers  { offerId }
   createdAt: "2026-03-21T..."
 }
 ```
+
+
+---
+
+*Part of the Colabonate Protocol Specification | [docs/protocols/](../README.md)*

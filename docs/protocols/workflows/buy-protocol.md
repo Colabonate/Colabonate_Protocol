@@ -1,5 +1,7 @@
 # Buy Protocol
 
+**Normativity:** Mixed
+
 **Status:** [IMPLEMENTED] Base flow | [PHASE 2] Escrow phases, timeout, auto-refund, OfferType distinction
 **Affects:** `POST /api/tickets`, `PATCH /api/tickets/:id`, `prisma/schema.prisma`
 
@@ -49,22 +51,23 @@ from a seller (Initiator).
    → Buyer cannot request again
 
 5. Seller creates Phase 1 invoice (25% reservation)
-   POST /api/tickets/:id/escrow-phase { phase: 1 }
-   → Invoice sent to buyer
+    POST /api/tickets/:id/escrow/phase1
+    → EscrowStatus: PHASE_1_PENDING
 
 6. Buyer pays invoice (in Lightning wallet)
-   → Webhook: POST /api/lightning/webhook
-   → Escrow Status: HELD (25% locked)
-   → Ticket Status: PAID
+    → Webhook: POST /api/lightning/webhook
+    → Escrow Status: RESERVED (25% locked)
+    → Ticket Status: PAID
 
 7. Seller delivers service/goods
-   → Creates Phase 2 invoice (50%)
-   → Buyer pays → Escrow: PARTIALLY_RELEASED (75%)
+    → Seller signals work start: POST /api/tickets/:id/escrow/phase2
+    → EscrowStatus: PHASE_2_PENDING → DELIVERY_STARTED (after buyer pays)
+    → 75% total held
 
 8. Buyer confirms receipt
-   → Triggers Phase 3 invoice (25%)
-   → Buyer pays → Escrow: FULLY_RELEASED (100%)
-   → Status: COMPLETED
+    → Seller confirms delivery: POST /api/tickets/:id/escrow/phase3
+    → Buyer pays Phase 3: EscrowStatus: DELIVERY_CONFIRMED → RELEASED
+    → Status: COMPLETED
 
 9. Review (Nostr Event Kind 30024, Phase 3)
 ```
@@ -84,22 +87,23 @@ from a seller (Initiator).
    → Seller can create invoice immediately
 
 3. Seller creates Phase 1 invoice (25% reservation)
-   POST /api/tickets/:id/escrow-phase { phase: 1 }
-   → Invoice sent to buyer
+    POST /api/tickets/:id/escrow/phase1
+    → EscrowStatus: PHASE_1_PENDING
 
 4. Buyer pays invoice (in Lightning wallet)
-   → Webhook: POST /api/lightning/webhook
-   → Escrow Status: HELD (25% locked)
-   → Ticket Status: PAID
+    → Webhook: POST /api/lightning/webhook
+    → Escrow Status: RESERVED (25% locked)
+    → Ticket Status: PAID
 
 5. Seller delivers product
-   → Creates Phase 2 invoice (50%)
-   → Buyer pays → Escrow: PARTIALLY_RELEASED (75%)
+    → Seller signals work start: POST /api/tickets/:id/escrow/phase2
+    → EscrowStatus: PHASE_2_PENDING → DELIVERY_STARTED (after buyer pays)
+    → 75% total held
 
 6. Buyer confirms receipt
-   → Triggers Phase 3 invoice (25%)
-   → Buyer pays → Escrow: FULLY_RELEASED (100%)
-   → Status: COMPLETED
+    → Seller confirms delivery: POST /api/tickets/:id/escrow/phase3
+    → Buyer pays Phase 3: EscrowStatus: DELIVERY_CONFIRMED → RELEASED
+    → Status: COMPLETED
 
 7. Review (Nostr Event Kind 30024, Phase 3)
 ```
@@ -176,10 +180,10 @@ from a seller (Initiator).
 }
 
 // After payment:
-{ status: "PAID", escrowStatus: "HELD" }
+{ status: "PAID", escrowStatus: "RESERVED" }
 
 // After completion:
-{ status: "COMPLETED", escrowStatus: "RELEASED_FULL" }
+{ status: "COMPLETED", escrowStatus: "RELEASED" }
 
 // On dispute:
 { status: "DISPUTED", disputeReason: "Item never arrived" }
@@ -189,6 +193,9 @@ from a seller (Initiator).
 
 ## Open Items (Phase 1 Backlog)
 
-- `PATCH /api/offers/:id` missing — offer cannot be closed when ticket reaches COMPLETED
-- `ACCEPTED` status is in schema but not set by routing
 - No notification system — seller must manually poll for new tickets
+
+
+---
+
+*Part of the Colabonate Protocol Specification | [docs/protocols/](../README.md)*

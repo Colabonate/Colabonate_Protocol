@@ -78,13 +78,13 @@ Bitcoin-native equivalents are listed at the bottom of this document.
 
 | Role | Description | Status |
 |------|-------------|--------|
-| **Initiator** | Creates offers, pays into escrow, initiates cooperation | [IMPLEMENTED] |
-| **Partner** | Accepts ticket, delivers service or goods, receives payment | [IMPLEMENTED] |
-| **Mediator** | Community expert, mediates disputes at Level 2 | [PHASE 3] |
-| **Arbitrator** | DAO juror, decides disputes at Level 3 | [PHASE 4] |
-| **Observer** | Reads public offers, views reputation | [IMPLEMENTED] via Nostr |
+| **Initiator** | Creates offers, pays into escrow, initiates cooperation | Phase 1 |
+| **Partner** | Accepts ticket, delivers service or goods, receives payment | Phase 1 |
+| **Mediator** | Community expert, mediates disputes at Level 2 | Phase 3 |
+| **Arbitrator** | DAO juror, decides disputes at Level 3 | Phase 4 |
+| **Observer** | Reads public offers, views reputation | Phase 1 |
 
-> Note: In the current Phase 1 implementation, roles are represented as `sellerPubkey` (Initiator) and `buyerPubkey` (Partner). Both roles are generalized to `Initiator/Partner` in the protocol spec to support cooperation use cases where both parties are equal.
+> Note: In the Phase 1 core flow, roles are represented as `sellerPubkey` (Initiator) and `buyerPubkey` (Partner). Both roles are generalized to `Initiator/Partner` in the broader protocol spec to support cooperation use cases where both parties are equal.
 
 ---
 
@@ -107,7 +107,7 @@ Bitcoin-native equivalents are listed at the bottom of this document.
 |--------|---------|
 | `ACTIVE` | Visible in marketplace |
 | `CLOSED` | Manually closed by seller |
-| `ARCHIVED` | Expired or admin-archived |
+| `ARCHIVED` | Expired or withdrawn |
 
 ---
 

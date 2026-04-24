@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_5"
+                  targetNamespace="http://colabonate.org/protocols/bpmn"
+                  exporter="Colabonate Protocol"
+                  exporterVersion="1.0.0">
+
+  <bpmn:process id="OnboardingFlow" name="Creator Onboarding Flow" isExecutable="false">
+
+    <!-- ========== START ========== -->
+    <bpmn:startEvent id="Start_AppOpen" name="App Opened&#10;(New User)">
+      <bpmn:outgoing>Flow_Welcome</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- ========== STEP 1: Welcome & Role Selection ========== -->
+    <bpmn:userTask id="Task_Welcome" name="Welcome Screen&#10;(App Intro)">
+      <bpmn:incoming>Flow_Welcome</bpmn:incoming>
+      <bpmn:outgoing>Flow_SelectRole</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_SelectRole" name="Select Role&#10;(Buyer / Seller / Both)">
+      <bpmn:incoming>Flow_SelectRole</bpmn:incoming>
+      <bpmn:outgoing>Flow_AuthGateway</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- ========== STEP 2: Authentication (LNURL-Auth) ========== -->
+    <bpmn:exclusiveGateway id="Gateway_Auth" name="Auth&#10;Method">
+      <bpmn:incoming>Flow_AuthGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_LNURL</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NIP07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- LNURL-Auth Flow (L0) -->
+    <bpmn:serviceTask id="Task_LNURL_Generate" name="GET /api/auth/lnurl&#10;(Generate LNURL)">
+      <bpmn:incoming>Flow_LNURL</bpmn:incoming>
+      <bpmn:outgoing>Flow_WalletSign</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_WalletSign" name="Wallet Signs k1&#10;(LNURL-Auth)">
+      <bpmn:incoming>Flow_WalletSign</bpmn:incoming>
+      <bpmn:outgoing>Flow_LNURL_Callback</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_LNURL_Callback" name="GET /api/auth/lnurl/callback&#10;(Verify Signature)">
+      <bpmn:incoming>Flow_LNURL_Callback</bpmn:incoming>
+      <bpmn:outgoing>Flow_Authenticated</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- NIP-07 Flow (L1) -->
+    <bpmn:userTask id="Task_NIP07_Sign" name="window.nostr.signEvent()&#10;(NIP-07 Extension)">
+      <bpmn:incoming>Flow_NIP07</bpmn:incoming>
+      <bpmn:outgoing>Flow_NIP07_Verify</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_NIP07_Verify" name="Verify NIP-07&#10;Signature">
+      <bpmn:incoming>Flow_NIP07_Verify</bpmn:incoming>
+      <bpmn:outgoing>Flow_Authenticated</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Authenticated -->
+    <bpmn:serviceTask id="Task_SetIdentity" name="Set Identity Level&#10;(L0: pubkey only)">
+      <bpmn:incoming>Flow_Authenticated</bpmn:incoming>
+      <bpmn:outgoing>Flow_RoleGateway</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- ========== STEP 3: Role-Specific Setup ========== -->
+    <bpmn:exclusiveGateway id="Gateway_Role" name="Selected&#10;Role?">
+      <bpmn:incoming>Flow_RoleGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_BuyerSetup</bpmn:outgoing>
+      <bpmn:outgoing>Flow_SellerSetup</bpmn:outgoing>
+      <bpmn:outgoing>Flow_BothSetup</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- BUYER PATH -->
+    <bpmn:userTask id="Task_Buyer_Preferences" name="Set Buyer Preferences&#10;(categories, location)">
+      <bpmn:incoming>Flow_BuyerSetup</bpmn:incoming>
+      <bpmn:outgoing>Flow_BuyerDone</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- SELLER PATH -->
+    <bpmn:userTask id="Task_Seller_CompanySetup" name="Company Setup&#10;(name, address, fields)">
+      <bpmn:incoming>Flow_SellerSetup</bpmn:incoming>
+      <bpmn:outgoing>Flow_Seller_Category</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_Seller_Category" name="Select Business&#10;Categories (UNSPSC)">
+      <bpmn:incoming>Flow_Seller_Category</bpmn:incoming>
+      <bpmn:outgoing>Flow_Seller_Payment</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_Seller_Payment" name="Payment Setup&#10;(Lightning wallet)">
+      <bpmn:incoming>Flow_Seller_Payment</bpmn:incoming>
+      <bpmn:outgoing>Flow_Seller_Logo</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_Seller_Logo" name="Upload Logo&#10;+ Company Images">
+      <bpmn:incoming>Flow_Seller_Logo</bpmn:incoming>
+      <bpmn:outgoing>Flow_Seller_Publish</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_Seller_PublishNostr" name="Publish Company&#10;(Kind 30027)">
+      <bpmn:incoming>Flow_Seller_Publish</bpmn:incoming>
+      <bpmn:outgoing>Flow_Seller_CreateOffer</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_Seller_CreateOffer" name="Create First Offer&#10;(Quick Create Banner)">
+      <bpmn:incoming>Flow_Seller_CreateOffer</bpmn:incoming>
+      <bpmn:outgoing>Flow_SellerDone</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- BOTH PATH -->
+    <bpmn:subProcess id="SubProcess_BothSetup" name="Buyer + Seller Setup" isTriggeredByEvent="false">
+
+      <bpmn:startEvent id="Start_Both" name="Both Roles">
+        <bpmn:outgoing>Flow_Both_Buyer</bpmn:outgoing>
+      </bpmn:startEvent>
+
+      <bpmn:callActivity id="Call_BuyerSetup" name="Buyer Preferences">
+        <bpmn:incoming>Flow_Both_Buyer</bpmn:incoming>
+        <bpmn:outgoing>Flow_Both_Seller</bpmn:outgoing>
+      </bpmn:callActivity>
+
+      <bpmn:callActivity id="Call_SellerSetup" name="Seller Company + Offer">
+        <bpmn:incoming>Flow_Both_Seller</bpmn:incoming>
+        <bpmn:outgoing>Flow_Both_Done</bpmn:outgoing>
+      </bpmn:callActivity>
+
+      <bpmn:endEvent id="End_Both" name="Both Roles Set Up">
+        <bpmn:incoming>Flow_Both_Done</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:sequenceFlow id="Flow_Both_Buyer" sourceRef="Start_Both" targetRef="Call_BuyerSetup" />
+      <bpmn:sequenceFlow id="Flow_Both_Seller" sourceRef="Call_BuyerSetup" targetRef="Call_SellerSetup" />
+      <bpmn:sequenceFlow id="Flow_Both_Done" sourceRef="Call_SellerSetup" targetRef="End_Both" />
+
+    </bpmn:subProcess>
+
+    <!-- ========== STEP 4: Identity Upgrade (Optional) ========== -->
+    <bpmn:exclusiveGateway id="Gateway_IdentityUpgrade" name="Upgrade&#10;Identity?">
+      <bpmn:incoming>Flow_MergeSetup</bpmn:incoming>
+      <bpmn:outgoing>Flow_L1Upgrade</bpmn:outgoing>
+      <bpmn:outgoing>Flow_SkipUpgrade</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- L0 → L1: NIP-07 Nostr Identity -->
+    <bpmn:userTask id="Task_L1_Nostr" name="Connect Nostr&#10;(NIP-07 Extension)&#10;→ Level 1">
+      <bpmn:incoming>Flow_L1Upgrade</bpmn:incoming>
+      <bpmn:outgoing>Flow_L1Gateway</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_L1Next" name="Further&#10;Upgrade?">
+      <bpmn:incoming>Flow_L1Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_L2Upgrade</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Finish</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- L1 → L2: Human Identity Verification -->
+    <bpmn:userTask id="Task_L2_HID" name="Human Identity&#10;Verification (HID)&#10;→ Level 2">
+      <bpmn:incoming>Flow_L2Upgrade</bpmn:incoming>
+      <bpmn:outgoing>Flow_Finish</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Skip upgrade -->
+    <bpmn:serviceTask id="Task_SkipUpgrade" name="Remain at L0">
+      <bpmn:incoming>Flow_SkipUpgrade</bpmn:incoming>
+      <bpmn:outgoing>Flow_Finish</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- ========== STEP 5: Complete ========== -->
+    <bpmn:serviceTask id="Task_SetupComplete" name="Onboarding Complete&#10;Redirect to Home">
+      <bpmn:incoming>Flow_Finish</bpmn:incoming>
+      <bpmn:outgoing>Flow_PublishKind0</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:serviceTask id="Task_PublishKind0" name="Publish Profile&#10;(Kind 0)">
+      <bpmn:incoming>Flow_PublishKind0</bpmn:incoming>
+      <bpmn:outgoing>Flow_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_OnboardingComplete" name="Onboarding&#10;Complete ✓">
+      <bpmn:incoming>Flow_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ========== SEQUENCE FLOWS ========== -->
+    <bpmn:sequenceFlow id="Flow_Welcome" sourceRef="Start_AppOpen" targetRef="Task_Welcome" />
+    <bpmn:sequenceFlow id="Flow_SelectRole" sourceRef="Task_Welcome" targetRef="Task_SelectRole" />
+    <bpmn:sequenceFlow id="Flow_AuthGateway" sourceRef="Task_SelectRole" targetRef="Gateway_Auth" />
+    <bpmn:sequenceFlow id="Flow_LNURL" name="LNURL-Auth" sourceRef="Gateway_Auth" targetRef="Task_LNURL_Generate" />
+    <bpmn:sequenceFlow id="Flow_NIP07" name="NIP-07" sourceRef="Gateway_Auth" targetRef="Task_NIP07_Sign" />
+    <bpmn:sequenceFlow id="Flow_WalletSign" sourceRef="Task_LNURL_Generate" targetRef="Task_WalletSign" />
+    <bpmn:sequenceFlow id="Flow_LNURL_Callback" sourceRef="Task_WalletSign" targetRef="Task_LNURL_Callback" />
+    <bpmn:sequenceFlow id="Flow_Authenticated" sourceRef="Task_LNURL_Callback" targetRef="Task_SetIdentity" />
+    <bpmn:sequenceFlow id="Flow_NIP07_Verify" sourceRef="Task_NIP07_Sign" targetRef="Task_NIP07_Verify" />
+    <bpmn:sequenceFlow id="Flow_RoleGateway" sourceRef="Task_SetIdentity" targetRef="Gateway_Role" />
+    <bpmn:sequenceFlow id="Flow_BuyerSetup" name="Buyer" sourceRef="Gateway_Role" targetRef="Task_Buyer_Preferences" />
+    <bpmn:sequenceFlow id="Flow_SellerSetup" name="Seller" sourceRef="Gateway_Role" targetRef="Task_Seller_CompanySetup" />
+    <bpmn:sequenceFlow id="Flow_BothSetup" name="Both" sourceRef="Gateway_Role" targetRef="SubProcess_BothSetup" />
+    <bpmn:sequenceFlow id="Flow_BuyerDone" sourceRef="Task_Buyer_Preferences" targetRef="Gateway_IdentityUpgrade" />
+    <bpmn:sequenceFlow id="Flow_Seller_Category" sourceRef="Task_Seller_CompanySetup" targetRef="Task_Seller_Category" />
+    <bpmn:sequenceFlow id="Flow_Seller_Payment" sourceRef="Task_Seller_Category" targetRef="Task_Seller_Payment" />
+    <bpmn:sequenceFlow id="Flow_Seller_Logo" sourceRef="Task_Seller_Payment" targetRef="Task_Seller_Logo" />
+    <bpmn:sequenceFlow id="Flow_Seller_Publish" sourceRef="Task_Seller_Logo" targetRef="Task_Seller_PublishNostr" />
+    <bpmn:sequenceFlow id="Flow_Seller_CreateOffer" sourceRef="Task_Seller_PublishNostr" targetRef="Task_Seller_CreateOffer" />
+    <bpmn:sequenceFlow id="Flow_SellerDone" sourceRef="Task_Seller_CreateOffer" targetRef="Gateway_IdentityUpgrade" />
+    <bpmn:sequenceFlow id="Flow_MergeSetup" sourceRef="SubProcess_BothSetup" targetRef="Gateway_IdentityUpgrade" />
+    <bpmn:sequenceFlow id="Flow_L1Upgrade" name="Yes" sourceRef="Gateway_IdentityUpgrade" targetRef="Task_L1_Nostr" />
+    <bpmn:sequenceFlow id="Flow_SkipUpgrade" name="Skip" sourceRef="Gateway_IdentityUpgrade" targetRef="Task_SkipUpgrade" />
+    <bpmn:sequenceFlow id="Flow_L1Gateway" sourceRef="Task_L1_Nostr" targetRef="Gateway_L1Next" />
+    <bpmn:sequenceFlow id="Flow_L2Upgrade" name="Yes → L2" sourceRef="Gateway_L1Next" targetRef="Task_L2_HID" />
+    <bpmn:sequenceFlow id="Flow_Finish" name="Done" sourceRef="Gateway_L1Next" targetRef="Task_SetupComplete" />
+    <bpmn:sequenceFlow id="Flow_PublishKind0" sourceRef="Task_SetupComplete" targetRef="Task_PublishKind0" />
+    <bpmn:sequenceFlow id="Flow_End" sourceRef="Task_PublishKind0" targetRef="End_OnboardingComplete" />
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_5">
+    <bpmndi:BPMNPlane id="BPMNPlane_5" bpmnElement="OnboardingFlow">
+      <bpmndi:BPMNShape id="Shape_Start_AppOpen" bpmnElement="Start_AppOpen">
+        <dc:Bounds x="160" y="280" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SubProcess_BothSetup" bpmnElement="SubProcess_BothSetup" isExpanded="false">
+        <dc:Bounds x="620" y="340" width="240" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_OnboardingComplete" bpmnElement="End_OnboardingComplete">
+        <dc:Bounds x="1620" y="280" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

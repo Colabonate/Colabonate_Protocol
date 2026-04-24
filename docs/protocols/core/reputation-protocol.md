@@ -1,5 +1,7 @@
 # Reputation Protocol – COL-Points and Review System
 
+**Normativity:** Mixed
+
 **Version:** 1.0.0-draft
 **Date:** 2026-03-22
 **Status:** [PHASE 3]
