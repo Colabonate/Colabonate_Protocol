@@ -11,6 +11,12 @@ Format: [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH`
 
 ---
 
+## [Dokumentation] – 2026-08-06 — Umsetzungs-Nachweis zur Protokoll-Revision
+
+- **`PROTOCOL_ALIGNMENT_RECORD.md`** — neues Begleitdokument zu `APP_ALIGNMENT_ANALYSIS.md`: hält die durchgeführte Angleichung des Protokolls an die App (v0.2.0 Truth-Reset + v0.2.1 Consistency Pass) fest — Auftrag, Quellen/Methode, gelieferte Arbeiten pro Datei, Verifikationsergebnisse, Git-Historie (Commits `40cf484`/`a4b3e47`) und offene Roadmap v0.3.0→v1.0.0.
+
+---
+
 ## [0.2.1-draft] – 2026-08-05 — Consistency pass
 
 Aligns the remaining technical/workflow specs to the non-custodial architecture introduced in v0.2.0 (no content contradictions with the reference implementation).
