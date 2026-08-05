@@ -11,7 +11,21 @@ Format: [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH`
 
 ---
 
-## [0.2.0-draft] – 2026-08-05 — "Truth-Reset" (re-align to reference implementation)
+## [0.2.1-draft] – 2026-08-05 — Consistency pass
+
+Aligns the remaining technical/workflow specs to the non-custodial architecture introduced in v0.2.0 (no content contradictions with the reference implementation).
+
+### Changed
+- **`core/protocol-spec-v1.md`** — rewrote the Protocol Layers table, architecture diagram, and Payment Flow to Direct-Pay (Path 1) + ICP Canister (Path 2); demoted Lightspark/Spark/RSK/NIP-57 to OBSERVE and Hold-Invoice to LEGACY; corrected Nostr table (30420=Proposal, 30421=Vote, 30422=Membership, added 30423=Comment); updated security boundaries and known gaps.
+- **`workflows/buy-protocol.md`** — added Payment-Path section and ADR-253 banner; Hold-Invoice escrow steps labeled legacy (`CUSTODIAL_LEGACY`).
+- **`workflows/sell-protocol.md`** — non-custodial receiving requirement (`SELLER_PAYMENT_NOT_CONFIGURED`); escrow option re-pointed to ICP canister.
+- **`workflows/cooperation-protocol.md`** — funding/release references updated to Direct-Pay / ICP canister milestones.
+- **`workflows/dispute-protocol.md`** — verdict enforcement mapped per payment path (Path 2 canister `submit_dao_verdict` vs Direct-Pay reputation-only vs legacy `escrow_action`).
+- **`core/vision.md`** — roadmap phase table updated (Direct-Pay marketplace; optional canister escrow).
+
+---
+
+
 
 > The reference implementation (Colabonate App) is the master for product decisions. This release re-aligns the specification to the architecture the app actually builds. Full gap analysis and forward roadmap: [APP_ALIGNMENT_ANALYSIS.md](APP_ALIGNMENT_ANALYSIS.md).
 

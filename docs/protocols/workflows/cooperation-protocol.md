@@ -42,7 +42,7 @@ Unlike the Buy Protocol (1 buyer + 1 seller, one-time), this covers
 
 7. Partner signs via pubkey (Nostr Event as confirmation)
 
-8. Escrow deposit by Initiator (full amount as Hold Invoice)
+8. Funding: Direct-Pay (no escrow) OR escrow deposit via ICP Canister (non-custodial; ADR-253)
 ```
 
 ### Phase C — Execution and Tracking
@@ -53,7 +53,7 @@ Unlike the Buy Protocol (1 buyer + 1 seller, one-time), this covers
 10. Partner reports milestone completion + evidence
 
 11. Initiator reviews and confirms
-    → Partial payment released (proportional from escrow)
+    → Partial payment released (Direct-Pay per milestone OR canister milestone release)
 
 12. Continue with step 9 for the next milestone
 ```
@@ -85,7 +85,7 @@ Unlike the Buy Protocol (1 buyer + 1 seller, one-time), this covers
 |-|-------------------|-------------|
 | Parties | 1 buyer + 1 seller | n parties possible |
 | Time structure | One-time | Multiple milestones |
-| Payment | Escrow phases (25/50/25) | Per milestone |
+| Payment | Direct-Pay / ICP escrow phases (25/50/25) | Per milestone (Direct-Pay or canister release) |
 | Outcome | Product / service | Joint deliverable |
 | Review | One-sided | Mutual |
 | Ticket type | `SMART_ORDER` | `MILESTONE` |

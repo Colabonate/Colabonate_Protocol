@@ -3,7 +3,9 @@
 **Normativity:** Normative
 
 **Status:** [ACTIVE] — Level 1 + Level 3 implemented via ADR-125 M0 + ADR-126 M2; Level 2 deferred
-**Prerequisites:** Lightning Escrow (Phase 2), Reputation System (Phase 3)
+**Prerequisites:** Payment/escrow (non-custodial; ADR-253), Reputation System (Phase 3)
+
+> (PDC: see ADR-253) – Verdict enforcement depends on the ticket's payment path: on a **Path 2 (ICP canister)** escrow the verdict is delivered to the canister as a signed `submit_dao_verdict` (split payout; see [escrow-canister-protocol.md](../core/escrow-canister-protocol.md) §7). On **Direct-Pay** (Path 1) there are no held funds, so a dispute affects reputation only (no fund release/refund is possible). The legacy Hold-Invoice verdict mapping (`escrow_action` via Kind 30408/30019) applies only to the never-public `CUSTODIAL_LEGACY` path.
 
 ## Purpose
 

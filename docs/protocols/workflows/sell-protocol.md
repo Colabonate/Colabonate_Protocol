@@ -2,8 +2,10 @@
 
 **Normativity:** Mixed
 
-**Status:** [IMPLEMENTED] Base flow | [PHASE 2] Notifications, offer-close, escrow
+**Status:** [IMPLEMENTED] Base flow + Direct-Pay receiving | [BUILD→PILOT] Optional ICP escrow (Path 2)
 **Affects:** `POST /api/offers`, `GET /api/offers`, `PATCH /api/tickets/:id`
+
+> (PDC: see ADR-253) – Receiving is **non-custodial**: the seller configures a receiving method (Lightning Address, NWC, or Cashu P2PK). An offer cannot go `ACTIVE` without a configured receiving method (`SELLER_PAYMENT_NOT_CONFIGURED`). The optional escrow path routes to the ICP Canister; see [escrow-protocol.md](../core/escrow-protocol.md).
 
 ## Purpose
 
@@ -84,7 +86,7 @@ POST /api/nostr/offers  { offerId }
 | Push notification | When buyer creates a ticket → Nostr DM or webhook |
 | Offer-close endpoint | `PATCH /api/offers/:id { status: "CLOSED" }` |
 | Offer expiry | Offer automatically closes after X days |
-| Escrow deposit | Seller can optionally deposit a security bond |
+| Escrow option (Path 2) | Listings above min size may enable ICP-canister escrow (non-custodial; ADR-253) |
 | Multi-ticket logic | Limit enforcement (max N open tickets per offer) |
 
 ---

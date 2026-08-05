@@ -39,8 +39,8 @@ A marketplace where:
 
 | Phase | Feature |
 |-------|---------|
-| Phase 2 | Lightning Escrow (multi-stage payments) |
-| Phase 2 | Milestone-based cooperations |
+| Phase 1 | Non-custodial Direct-Pay marketplace (Lightning / Cashu) |
+| Phase 2 | Optional escrow via ICP native-Bitcoin canister + milestone cooperations |
 | Phase 3 | Reputation system via Nostr Events (Soulbound) |
 | Phase 4 | Dispute resolution (3-level) |
 | Phase 4+ | DAO governance via Nostr votes |

@@ -2,10 +2,18 @@
 
 **Normativity:** Mixed
 
-**Status:** [IMPLEMENTED] Base flow | [PHASE 2] Escrow phases, timeout, auto-refund, OfferType distinction
+**Status:** [IMPLEMENTED] Base flow + Direct-Pay | [BUILD→PILOT] ICP Escrow (Path 2) | [LEGACY] Hold-Invoice escrow phases (never public)
 **Affects:** `POST /api/tickets`, `PATCH /api/tickets/:id`, `prisma/schema.prisma`
 
 > (PDC: see ADR-021) – Added OfferType SERVICE vs PRODUCT distinction
+> (PDC: see ADR-253) – Payment & escrow are **non-custodial**. The authoritative payment/escrow spec is [escrow-protocol.md](../core/escrow-protocol.md). Direct-Pay (Lightning Address / NWC / Cashu P2PK) is the default, no-escrow path; the optional escrow path runs on the ICP Canister ([escrow-canister-protocol.md](../core/escrow-canister-protocol.md)). The `EscrowStatus` PHASE_* values shown in the flows below belong to the **legacy Hold-Invoice** machine (`escrowProvider = CUSTODIAL_LEGACY`) — retained behind a kill-flag, never activated in production. The ticket status machine (PENDING → IN_PROGRESS → COMPLETED / DISPUTED / CANCELLED) is unchanged across all paths.
+
+## Payment Path (per listing)
+
+| Path | When | Custody | Status |
+|------|------|---------|--------|
+| **Direct-Pay** (`escrowProvider = NONE`) | Listings without escrow option (default, esp. micro-trades) | None | Implemented |
+| **ICP Escrow Canister** (`escrowProvider = ICP`) | Listings with escrow option, above min size | Provable no human | Build → Pilot |
 
 ## Purpose
 
