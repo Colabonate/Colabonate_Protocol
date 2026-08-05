@@ -2,9 +2,9 @@
 
 > An open protocol standard for decentralized trade and cooperation via Bitcoin Lightning.
 
-**Status:** `v0.1.1-draft` — Active development. Community input welcome. Not yet a finalized standard.
+**Status:** `v0.2.0-draft` — Active development. Community input welcome. Not yet a finalized standard.
 
-[![Specification Status](https://img.shields.io/badge/spec-v0.1.1--draft-yellow)](SPECIFICATION_STATUS.md)
+[![Specification Status](https://img.shields.io/badge/spec-v0.2.0--draft-yellow)](SPECIFICATION_STATUS.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Bitcoin-only](https://img.shields.io/badge/Bitcoin-only-orange)](docs/decisions/007-protocol-documentation-bitcoin-only.md)
 
@@ -35,8 +35,8 @@ This repository contains the **protocol specification** and supporting documenta
 | **Identity Verification** | Humanode Biomapper (ZK biometric) | [identity-protocol.md](docs/protocols/identity/identity-protocol.md) |
 | **Transport** | Nostr Protocol (NIP-01, NIP-57) | [nostr-events.md](docs/protocols/core/nostr-events.md) |
 | **Marketplace** | Nostr Kind 30017 Offers | [sell-protocol.md](docs/protocols/workflows/sell-protocol.md) |
-| **Payments** | Bitcoin L1 / Lightspark Grid / RSK | [payment-architecture.md](docs/protocols/core/payment-architecture.md) |
-| **Escrow** | LNBits Hold Invoices / RSK | [escrow-protocol.md](docs/protocols/core/escrow-protocol.md) |
+| **Payments** | Lightning / Cashu / ICP (non-custodial) | [payment-architecture.md](docs/protocols/core/payment-architecture.md) |
+| **Escrow** | ICP Canister (native BTC) + Direct-Pay | [escrow-protocol.md](docs/protocols/core/escrow-protocol.md) · [escrow-canister-protocol.md](docs/protocols/core/escrow-canister-protocol.md) |
 | **Reputation** | COL-Points + Nostr Reviews | [reputation-protocol.md](docs/protocols/core/reputation-protocol.md) |
 | **Governance** | Nostr Votes + DAO Codex | [dao-codex.md](docs/protocols/governance/dao-codex.md) |
 
@@ -70,8 +70,9 @@ To build a Colabonate-compatible client, read in this order:
 3. [Roles](docs/protocols/core/roles.md) — Initiator, Partner, Mediator, Arbitrator, Observer
 4. [Nostr Events](docs/protocols/core/nostr-events.md) — All event kinds (30017–30026 + NIP-57) with full schemas
 5. [Ticket System](docs/protocols/core/ticket-system.md) — The central interaction object
-6. [Escrow Protocol](docs/protocols/core/escrow-protocol.md) — Lightning trustless payment mechanics
-7. [Glossary](docs/protocols/GLOSSARY.md) — Canonical term definitions
+6. [Escrow Protocol](docs/protocols/core/escrow-protocol.md) — Non-custodial payment & escrow paths
+7. [Escrow Canister Protocol](docs/protocols/core/escrow-canister-protocol.md) — ICP native-Bitcoin escrow (Path 2)
+8. [Glossary](docs/protocols/GLOSSARY.md) — Canonical term definitions
 
 ---
 

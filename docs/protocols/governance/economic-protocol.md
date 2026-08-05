@@ -1,8 +1,11 @@
 # Economic Protocol – COLA Token and Fee Structure
 
-**Version:** 1.0.0-draft
-**Date:** 2026-03-22
-**Status:** [PHASE 4]
+**Version:** 1.1.0-draft
+**Date:** 2026-08-05
+**Status:** [PHASE 4] Token/staking | [IMPLEMENTED] Fee model (ADR-245: permanently free core commerce)
+
+> (PDC: see ADR-245) — Core commerce is permanently free; introducing a core fee is a Reputation-chamber Protocol Upgrade decision.
+> (PDC: see ADR-244) — Two-chamber governance: Reputation (COL-Points) decides the *what*; Capital (staked COLA) decides the *how much* (treasury allocation only).
 
 ---
 
@@ -97,26 +100,29 @@ See [dao-codex.md](./dao-codex.md) for voting model selection rules.
 
 ## Fee Structure
 
-### Phase 1–3: No Platform Fee
+> (PDC: see ADR-245) — permanent decision
 
-During Phases 1–3, the Colabonate protocol charges **zero platform fees** on all transactions. This applies to:
-- Buy/sell transactions (any amount)
-- Cooperation milestone payments
-- Any ticket type
+### Core Commerce — Permanently Free
 
-Rationale: Community growth and adoption take precedence over revenue in early phases.
+Core commerce is **permanently free**, in every phase, every amount, every ticket type, every escrow phase. This covers:
 
-### Phase 4: Dispute Resolution Fees
+- Buy / sell transactions
+- Cooperation + milestone payments
+- Escrow (Path 2 canister pilot fee is a compile-time constant set to **0**)
 
-When dispute resolution services are used, a fee is deducted from the escrow:
+This is a deliberate, permanent positioning — the sharpest contrast to 15–30% Web2 marketplaces. **Introducing a core-usage fee is itself a governance decision**: it requires a Reputation-chamber **Protocol Upgrade** vote (the chamber that decides the *what*; capital cannot buy this change). Until such a vote passes, core commerce remains free.
+
+### Dispute Resolution Fees (only on escalation)
+
+Fees apply **only** when dispute resolution services are used, deducted from the escrowed/held value as service compensation:
 
 | Service | Fee | Who Receives |
 |---------|-----|-------------|
 | Level 2 Mediation | 1% of ticket value | Mediator (in sats) |
-| Level 3 Arbitration | 2% of ticket value | Split: arbitrators + DAO community pool |
-| No dispute | 0% | — |
+| Level 3 Arbitration | 2% of ticket value | Arbitrators + DAO community pool |
+| **No dispute** | **0%** | — |
 
-Fees are deducted from escrow by the arbitrator verdict instruction event (Kind 30019 with `escrow_action` tag).
+For Path 2 (ICP canister) the fee is enforced as a compile-time-constant payout share (set to 0 for the pilot). For the legacy Hold-Invoice path the fee is encoded in the arbitrator verdict instruction (Kind 30408/30019 with `escrow_action`).
 
 ### Phase 5: Protocol Royalties
 
@@ -127,7 +133,7 @@ Community-published protocol workflows can carry royalty fees:
 | Fee type | Sat-denominated, per-use |
 | Collection | Lightning Keysend to protocol author's pubkey |
 | Amount | Set by protocol author (protocol may define max cap) |
-| Distribution | 100% to protocol author (minus optional Foundation share if using Foundation infrastructure) |
+| Distribution | 100% to protocol author (minus optional Foundation share ≤0.5% **only** when Foundation infrastructure is used) |
 | Governance | DAO can set maximum royalty rate cap |
 
 This enables a **protocol marketplace** where community members create, publish, rate, and monetize workflow protocols. See [governance-roadmap.md](./governance-roadmap.md) Phase 5.
@@ -143,7 +149,7 @@ The Foundation's sustainability is funded by:
 | Grants | Variable | Spiral, OpenSats, Bitcoin grants |
 | Donations | Variable | [Open Collective](https://opencollective.com/colabonate), [Patreon](https://www.patreon.com/c/Colabonate), Lightning donations |
 
-The Foundation explicitly does NOT collect fees on base protocol usage (buy/sell/cooperation without dispute) in Phase 1–4.
+The Foundation explicitly does NOT collect fees on base protocol usage (buy/sell/cooperation without dispute) — this is permanent (ADR-245), not phase-limited.
 
 ---
 

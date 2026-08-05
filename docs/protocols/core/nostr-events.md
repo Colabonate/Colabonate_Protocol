@@ -1,9 +1,12 @@
 # Colabonate Nostr Event Kinds
 
 **Normativity:** Normative
-**Version:** 1.0.0-draft
-**Date:** 2026-04-11
-**Status:** [IMPLEMENTED] Kind 30017, 30018/30407, 30019/30408, 30020, 30021, 30022, 30024, 30027 (marketplace/governance/reputation) | [IMPLEMENTED] Kind 30414, 30415 (NIP-C cooperation) | [IMPLEMENTED] Kind 30420–30422 (DAO governance) | [PHASE 3] Kind 30023, 30026 (identity attestation/proximity) | [PHASE 4] Kind 30025 (COLA staking)
+**Version:** 1.1.0-draft
+**Date:** 2026-08-05
+**Status:** [IMPLEMENTED] Kind 30017, 30018/30407, 30019/30408, 30020, 30021, 30022, 30024, 30027 (marketplace/governance/reputation) | [IMPLEMENTED] Kind 30414, 30415 (NIP-C cooperation) | [IMPLEMENTED] Kind 30420–30423 (DAO governance) | [PHASE 3] Kind 30023, 30026 (identity attestation/proximity) | [PHASE 4] Kind 30025 (COLA staking)
+
+> (PDC: see ADR-101) — NIP-15 conflict dual-publishing.
+> (PDC: see ADR-105/111/112/128) — DAO governance kinds.
 
 ---
 
@@ -18,6 +21,21 @@
 
 ---
 
+> **⚠️ AUTHORITATIVE SOURCE OF TRUTH (DAO kind reconciliation)**
+> The **definitive** kind-number assignment is the reference implementation's `kind-mapping.ts` and `dao-nostr.ts`. This document is reconciled to that source as of v1.1.0. Earlier drafts assigned `30420=DAO Profile/Creation`, `30421=DAO Codex` — those assignments **conflict with production code** and are corrected below:
+>
+> | Kind | This document (corrected) | Code (master) |
+> |------|---------------------------|---------------|
+> | 30022 | Governance Vote / DAO Creation / Arbitration Verdict (`sub_type`-governed) | `dao-nostr.ts` publishes DAO creation + verdicts as 30022 |
+> | 30420 | **DAO Proposal** | `DaoProposal` |
+> | 30421 | **DAO Vote** | `DaoVote` |
+> | 30422 | DAO Membership / Registration | `DaoMember` registration |
+> | 30423 | **DAO Proposal Comment** (new) | `DaoProposalComment` |
+>
+> A DAO's *creation event* and *codex record* are published as **Kind 30022** (`sub_type: dao_creation`) and referenced from the DAO profile fields, not as separate 30420/30421 events. The "DAO Profile" / "DAO Codex" concepts remain valid data, but their Nostr surface is the 30022 creation/verdict event plus the DAO's stored profile, not distinct kinds.
+
+---
+
 ## Overview
 
 Colabonate uses the [Nostr protocol](https://github.com/nostr-protocol/nostr) (NIP-01) as its decentralized transport and event layer. All protocol interactions that require auditability, decentralization, or cross-client interoperability are published as Nostr events.
@@ -27,7 +45,12 @@ Colabonate uses **addressable events** (kinds 30000–39999 per NIP-01) because:
 - They can be queried by `pubkey` + `kind` + `d`-tag combinations
 - They persist on relays even if the creator goes offline
 
-**Kind range reserved:** `30017` – `30027` (internal convention pending NIP registration; see [NIP registration pathway](#nip-registration-pathway))
+**Kind ranges used (internal convention pending NIP registration; see [NIP registration pathway](#nip-registration-pathway)):**
+- `30017`–`30027` — core marketplace/transaction/identity/reputation/governance (legacy)
+- `30028`–`30029` — cooperation proposal/milestone (legacy dual of 30414/30415)
+- `30402`, `30404`–`30409` — NIP-99-compliant duals (see dual-publishing table)
+- `30414`–`30415` — NIP-C cooperation layer
+- `30420`–`30423` — DAO governance (proposal/vote/membership/comment)
 
 ---
 
@@ -55,6 +78,14 @@ Kind 9735   — Economic layer       (NIP-57: Lightning Zap Receipt / settlement
 NIP-C Cooperation Layer (draft):
 Kind 30414  — Cooperation Proposal  (NIP-C: proposal + partner acceptance)
 Kind 30415  — Milestone Event       (NIP-C: per-milestone completion proof)
+(legacy duals: Kind 30028 = Cooperation Proposal, Kind 30029 = Milestone)
+
+DAO Governance Layer:
+Kind 30022  — Governance Vote / DAO Creation / Arbitration Verdict (sub_type-governed)
+Kind 30420  — DAO Proposal
+Kind 30421  — DAO Vote
+Kind 30422  — DAO Membership / Registration
+Kind 30423  — DAO Proposal Comment
 ```
 
 ---
@@ -1075,41 +1106,48 @@ COMPLETED ──► DISPUTED   (initiator rejects)
 
 To comply with [NIP-99 (Classified Listings Standard)](https://github.com/nostr-protocol/nips/blob/master/99.md), Colabonate dual-publishes marketplace and transaction events in both legacy (30017–30019) and NIP-compliant (30402–30408) kinds.
 
-| Legacy Kind | NIP-99 Kind | Purpose | Notes |
-|-------------|-------------|---------|-------|
-| 30017 | 30402 | Classified Listing (Offer) | Marketplace layer |
-| 30018 | 30407 | Listing/Offer Interaction (Ticket) | Transaction layer |
-| 30019 | 30408 | Listing Status Update | Transaction state machine |
+| Legacy Kind | NIP-99 / NIP-C Kind | Purpose | Notes |
+|-------------|---------------------|---------|-------|
+| 30017 | 30402 | Offer | Marketplace layer |
+| 30018 | 30407 | Ticket Created | Transaction layer |
+| 30019 | 30408 | Ticket Status Update | Transaction state machine |
+| 30020 | 30409 | Dispute Opened | Dispute layer |
+| 30021 | 30405 | Verification Credential | Identity layer |
+| 30024 | 30406 | Reputation / Review | Reputation layer |
+| 30027 | 30404 | Company Profile | Marketplace layer |
+| 30028 | 30414 | Cooperation Proposal | NIP-C cooperation |
+| 30029 | 30415 | Milestone Event | NIP-C cooperation |
 
-**Implementation:** Both kinds are published in parallel. Clients may subscribe to either range. Legacy kinds (30017–30019) will be deprecated after a deprecation period (see [ADR-101](../../decisions/101-nip-15-kind-conflict.md) for timeline).
+**Implementation:** Legacy and NIP-compliant kinds are published in parallel. Clients may subscribe to either range. Only `30017–30019` are in genuine conflict with NIP-15 (hard dual-publish); the remaining legacy/NIP-99 pairs are a convention for compatibility. Legacy kinds will be deprecated after a deprecation period (see [ADR-101](../../decisions/101-nip-15-kind-conflict.md) for timeline).
 
 **Schemas:** NIP-99 kinds 30402, 30407, 30408 use identical schemas to their legacy counterparts (30017, 30018, 30019 above). No schema duplication needed here — implementers should reference the legacy kind documentation and treat the NIP-99 kinds as direct replacements.
 
 ---
 
-## Kind 30420 — DAO Profile / Creation
+## Kind 30420 — DAO Proposal
 
 **Status:** [IMPLEMENTED] (ADR-105, Foundation DAO bootstrap)
 **Layer:** Governance
-**Purpose:** A DAO publishes its governance profile, codex version, and member list. Addressable by DAO ID.
+**Purpose:** A governance proposal submitted to a DAO for voting. Addressable by proposal ID within a DAO.
+
+> **Correction (v1.1.0):** Earlier drafts labeled 30420 as "DAO Profile / Creation". The DAO creation event and profile are published as **Kind 30022** (`sub_type: dao_creation`); 30420 is the **proposal** kind, per the reference implementation.
 
 ### Schema
 
 ```json
 {
   "kind": 30420,
-  "pubkey": "<dao-admin-pubkey>",
+  "pubkey": "<proposer-pubkey>",
   "created_at": 1234567890,
   "tags": [
-    ["d", "<dao-id>"],
-    ["name", "<dao-name>"],
-    ["description", "<dao-description>"],
-    ["codex_version", "<semantic-version>"],
-    ["codex_hash", "<sha256-hash-of-codex>"],
-    ["member_count", "<int>"],
+    ["d", "<proposal-id>"],
+    ["dao_id", "<dao-id>"],
+    ["title", "<proposal-title>"],
+    ["proposal_type", "normal_decision|codex_amendment|treasury_spending|sanction|protocol_upgrade|new_dao_creation"],
+    ["status", "draft|comment_period|active|passed|rejected|executed|cancelled"],
     ["voting_model", "1p1v|token|reputation"]
   ],
-  "content": "<dao-metadata-json>",
+  "content": "<proposal-body>",
   "sig": "<schnorr-signature>"
 }
 ```
@@ -1118,58 +1156,48 @@ To comply with [NIP-99 (Classified Listings Standard)](https://github.com/nostr-
 
 | Tag | Description |
 |-----|-------------|
-| `d` | Unique DAO identifier (e.g., "colabonate-foundation") |
-| `name` | Human-readable DAO name |
-| `codex_version` | Semantic version of the current Codex (e.g., "1.0.0") |
-| `codex_hash` | SHA-256 hash of the full Codex text (for verification) |
+| `d` | Unique proposal identifier |
+| `dao_id` | DAO the proposal belongs to |
+| `proposal_type` | One of the six proposal types (see quorum table in Kind 30022) |
+| `status` | Proposal lifecycle state |
 
 ### Optional Tags
 
 | Tag | Description |
 |-----|-------------|
-| `description` | DAO mission / description text |
-| `voting_model` | Primary voting mechanism: `1p1v` (Humanode), `token` (COLA-weighted), `reputation` (COL-Points) |
-| `member_count` | Approximate active member count |
+| `title` | Human-readable proposal title |
+| `voting_model` | Voting mechanism used for this proposal |
+| `codex_hash` | For codex amendments: hash of the proposed new codex |
 
-### Content (JSON)
+### Content
 
-```json
-{
-  "dao_id": "<dao-id>",
-  "founding_pubkey": "<founder-pubkey>",
-  "created_at": 1234567890,
-  "codex_url": "<https-url-to-codex>",
-  "voting_rules": {
-    "quorum_percent": 10,
-    "majority_percent": 50
-  }
-}
-```
+Free-text proposal body (rationale, proposed change, options). Markdown supported.
 
 ---
 
-## Kind 30421 — DAO Codex (Governance Rules)
+## Kind 30421 — DAO Vote
 
-**Status:** [IMPLEMENTED] (ADR-111)
+**Status:** [IMPLEMENTED] (ADR-128)
 **Layer:** Governance
-**Purpose:** The authoritative record of a DAO's governance rules, dispute resolution procedures, and operational codex. Versioned and content-addressed.
+**Purpose:** A member's vote on a DAO proposal. One event per vote.
+
+> **Correction (v1.1.0):** Earlier drafts labeled 30421 as "DAO Codex". The codex record is content-addressed and referenced via `codex_hash`/`codex_version` tags on the Kind 30022 creation event and proposals; 30421 is the **vote** kind, per the reference implementation.
 
 ### Schema
 
 ```json
 {
   "kind": 30421,
-  "pubkey": "<dao-admin-pubkey>",
+  "pubkey": "<voter-pubkey>",
   "created_at": 1234567890,
   "tags": [
-    ["d", "<dao-id>-<codex-version>"],
+    ["d", "<vote-id>"],
     ["dao_id", "<dao-id>"],
-    ["codex_version", "<semantic-version>"],
-    ["title", "<codex-title>"],
-    ["effective_date", "<unix-timestamp>"],
-    ["previous_codex_version", "<prior-version-if-amendment>"]
+    ["proposal", "<proposal-id>"],
+    ["vote", "for|against|abstain"],
+    ["voting_model", "1p1v|token|reputation"]
   ],
-  "content": "<full-codex-markdown-or-html>",
+  "content": "<optional-rationale>",
   "sig": "<schnorr-signature>"
 }
 ```
@@ -1178,14 +1206,23 @@ To comply with [NIP-99 (Classified Listings Standard)](https://github.com/nostr-
 
 | Tag | Description |
 |-----|-------------|
-| `d` | Composite: `<dao-id>-<version>` enables version history queries |
-| `dao_id` | Reference to the DAO |
-| `codex_version` | Full semantic version (e.g., "1.0.0", "1.1.0-amendment-1") |
-| `effective_date` | Unix timestamp when this codex version becomes active |
+| `d` | Unique vote ID |
+| `dao_id` | DAO the vote is cast in |
+| `proposal` | Reference to the Kind 30420 proposal |
+| `vote` | `for` \| `against` \| `abstain` |
+| `voting_model` | `1p1v` \| `token` \| `reputation` |
 
-### Content
+### Optional Tags
 
-The full text of the DAO's governance codex — procedures for dispute resolution, voting quorum, proposal types, sanctions, etc. Max 65536 characters (Markdown or structured text).
+| Tag | Required for Model | Description |
+|-----|--------------------|-------------|
+| `hid_level` | `1p1v` | Must be `3` (Humanode Level 3) |
+| `cola_staked` | `token` | COLA staked for this vote's weight |
+| `reputation_score` | `reputation` | COL-Points score at time of vote |
+
+### Vote weight
+
+Vote weight depends on the proposal's `voting_model` and the two-chamber governance model (ADR-244): the Reputation chamber (COL-Points) decides the *what*; the Capital chamber (staked COLA) decides treasury allocation *amounts* only. See [dao-codex.md](../governance/dao-codex.md).
 
 ---
 
@@ -1242,6 +1279,51 @@ The full text of the DAO's governance codex — procedures for dispute resolutio
 - **Self-registration**: A member can publish Kind 30422 with their own pubkey in `member` tag, setting `status=pending`.
 - **Admin approval**: DAO admin publishes Kind 30422 with `status=active` or `revoked` to finalize membership.
 - **Role assignment**: Only admin pubkey can set `role` to `arbitrator` or `mediator`.
+
+---
+
+## Kind 30423 — DAO Proposal Comment
+
+**Status:** [IMPLEMENTED]
+**Layer:** Governance
+**Purpose:** A comment on a DAO proposal during its comment period. Supports deliberation before and during voting.
+
+### Schema
+
+```json
+{
+  "kind": 30423,
+  "pubkey": "<commenter-pubkey>",
+  "created_at": 1234567890,
+  "tags": [
+    ["d", "<comment-id>"],
+    ["dao_id", "<dao-id>"],
+    ["proposal", "<proposal-id>"],
+    ["p", "<proposer-or-mentioned-pubkey>"]
+  ],
+  "content": "<comment-text>",
+  "sig": "<schnorr-signature>"
+}
+```
+
+### Required Tags
+
+| Tag | Description |
+|-----|-------------|
+| `d` | Unique comment identifier |
+| `dao_id` | DAO the proposal belongs to |
+| `proposal` | Reference to the Kind 30420 proposal being commented on |
+
+### Optional Tags
+
+| Tag | Description |
+|-----|-------------|
+| `p` | Mentioned pubkey (e.g. proposer, another commenter) |
+| `parent` | Reference to a parent comment (threaded replies) |
+
+### Content
+
+Free-text comment. Markdown supported. Max 4096 characters.
 
 ---
 

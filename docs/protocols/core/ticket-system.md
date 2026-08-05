@@ -76,8 +76,10 @@ model Ticket {
   codexHash        String?      // SHA-256 of Codex at binding time
   codexVersion     String?      // Human-readable Codex version (e.g. "1.2")
   escrowStatus     String       @default("NONE") // Volatile: EscrowStatus values, zod-validated
+  escrowProvider   String       @default("NONE") // NEW (ADR-253/FU-253-E): NONE | CUSTODIAL_LEGACY | ICP
+  directPayRail    String?      // NEW (ADR-253): LN | CASHU (only when escrowProvider = NONE)
   
-  // Escrow phase invoices
+  // Escrow phase invoices (legacy Hold-Invoice path only)
   phase1Invoice    String?
   phase2Invoice    String?
   phase3Invoice    String?
@@ -109,6 +111,8 @@ enum TicketType {
 > **⚠️ EscrowStatus note:** The Prisma schema uses string validation (`EscrowStatusSchema`). The active set (INITIATED, PHASE_1_PENDING, RESERVED, etc.) is defined in [escrow-protocol.md](./escrow-protocol.md) and used by `apps/server/routes/escrow.ts` (ADR-124). The legacy set (FUNDED, RELEASE_PHASE_1, etc.) from an earlier spec draft remains valid in the Zod schema but is unused.
 >
 > (PDC: see ADR-124)
+
+> **⚠️ `escrowProvider` / `directPayRail` (ADR-253 / FU-253-E):** A ticket discriminates its payment/escrow path via `escrowProvider` (`NONE | CUSTODIAL_LEGACY | ICP`). The legacy `escrowStatus` vocabulary (above) is coupled to the **CUSTODIAL_LEGACY** Hold-Invoice machine; Path 1 (Direct-Pay, `escrowProvider = NONE`) and Path 2 (ICP canister, `escrowProvider = ICP`) use the canister `TradeState` / Direct-Pay flow instead — see [escrow-protocol.md](./escrow-protocol.md). When `escrowProvider = NONE`, `directPayRail` indicates which Direct-Pay rail applies (`LN` or `CASHU`). The ticket also enforces an XOR: exactly one of `offerId` or `cooperationId` is set (cooperation tickets have no offer; PDC: see ADR-204).
 
 **OfferType Behavior:**
 

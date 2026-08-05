@@ -89,7 +89,7 @@ Clear separation between implemented, planned, and long-term.
 
 ## V1 Centralization Register
 
-Colabonate V1 ships as a reference implementation with some centralized coordination points. Every such point has an explicit roadmap to decentralization. This register ensures:
+Colabonate V1 ships as an implementation with some centralized coordination points. Every such point has an explicit roadmap to decentralization. This register ensures:
 - No hidden assumptions about centralization
 - Clear timeline for removal of centralized components
 - Third-party implementations know what is optional (Coordination Layer) vs. normative (Protocol Layer)

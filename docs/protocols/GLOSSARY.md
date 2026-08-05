@@ -14,7 +14,12 @@ Bitcoin-native equivalents are listed at the bottom of this document.
 |------|-----------|
 | **Ticket** | Central interaction object — represents a contract between parties. Tracks payment, status, and deliverables. |
 | **Offer** | A seller's listing in the marketplace, published as a Nostr Kind 30017 event. |
-| **Escrow** | Trustless payment handling via Lightning Hold Invoices (no third party holds keys). See [escrow-protocol.md](core/escrow-protocol.md). |
+| **Escrow** | Held-fund payment handling. In Colabonate this is **non-custodial**: Path 2 uses an ICP canister holding native Bitcoin (provably no human control); Path 1 Direct-Pay holds no funds. See [escrow-protocol.md](core/escrow-protocol.md). |
+| **Direct-Pay** | Path 1 payment — buyer pays seller directly (Lightning Address, NWC, or Cashu P2PK) with **no escrow** and **no platform custody**. Buyer protection is reputation, not held funds. |
+| **ICP Escrow Canister** | Path 2 escrow agent: an Internet Computer canister holding **native Bitcoin** via threshold-ECDSA, with provably no human control (blackholed or DAO-controlled). See [escrow-canister-protocol.md](core/escrow-canister-protocol.md). |
+| **escrowProvider** | Ticket field discriminating the payment path: `NONE` (Direct-Pay), `CUSTODIAL_LEGACY` (Hold-Invoice, never public), `ICP` (canister escrow). |
+| **Cashu** | Ecash protocol (NIP-60/61) enabling non-custodial payments via third-party mints. Used as a Direct-Pay rail (P2PK). Colabonate never operates its own mint. |
+| **NWC** | Nostr Wallet Connect (NIP-47) — connects to the user's own Lightning wallet for non-custodial pay/receive. |
 | **LNURL-Auth** | Passwordless authentication via Lightning wallet (LUD-04). No email, no password. |
 | **Nostr** | Decentralized protocol for events and messages (no central server). All protocol state changes are published as Nostr events. |
 | **Pubkey** | Public key = user identity. One Lightning wallet generates one pubkey per service domain. |
@@ -22,14 +27,14 @@ Bitcoin-native equivalents are listed at the bottom of this document.
 | **Sats** | Satoshi — smallest Bitcoin unit (1 BTC = 100,000,000 sats). All payments in Colabonate are denominated in sats. |
 | **Soulbound** | Non-transferable credential bound to a pubkey via Nostr event signature. Cannot be bought, sold, or transferred. |
 | **Relay** | Nostr server that routes and stores events. Not a central service — the protocol works with any NIP-01 compliant relay. |
-| **Hold Invoice** | A BOLT11 Lightning invoice that is not automatically settled — funds are held in transit until the invoice holder manually settles or cancels. Used for escrow. |
+| **Hold Invoice** | A BOLT11 Lightning invoice not auto-settled — funds held until the holder settles/cancels. **Legacy** in Colabonate: the custodial Hold-Invoice escrow stack remains behind a kill-flag and is never activated in production (PDC: see ADR-253). |
 | **Biotoken** | A cryptographic hash of biometric data generated on-device. The hash is one-way — the original biometric cannot be recovered from it. |
-| **Lightspark Grid** | Enterprise-grade Lightning Network infrastructure with automatic pathfinding and liquidity management. The Performance Layer of Colabonate's three-layer payment stack. |
-| **Spark Stablecoins** | Lightning-native price-stable assets (USD, EUR etc.) transferred over Lightspark Grid. Optional payment currency — all protocol fees remain in sats. |
-| **Unified Wallet** | The user-facing abstraction of Colabonate's three-layer payment stack (L1 / Lightspark / RSK). Automatically routes payments to the correct layer. |
-| **Codex Fork** | A Bitcoin-based economic sub-unit created by a HID-verified user on RSK. Governed by a referenced Codex, trades exclusively on the RSK contract layer. Used for project financing, cooperative funds, and other regulated economic instruments. |
-| **RBTC** | Native token of the RSK sidechain. 1:1 pegged to Bitcoin via two-way peg. Used for gas fees on RSK. No ETH involved. |
-| **NIP-57 Zap** | Nostr Lightning payment event (tipping, micro-rewards). Supported via Lightspark Grid in Phase 2. |
+| **Lightspark Grid** | Enterprise Lightning infrastructure with automatic pathfinding/liquidity. **Observe-track** (not implemented); was earlier drafts' performance layer. |
+| **Spark Stablecoins** | Lightning-native price-stable assets. **Observe-track** (not implemented). |
+| **Unified Wallet** | Historical abstraction name for the multi-wallet connection model. The protocol now connects to the user's own wallets (NWC, Alby, Cashu, WebLN) without hosting a wallet. |
+| **Codex Fork** | A Bitcoin-based economic sub-unit governed by a Codex. Conceptually tied to the RSK contract layer — **observe-track** (RSK not implemented). |
+| **RBTC** | Native token of the RSK sidechain. 1:1 pegged to Bitcoin via two-way peg. Used for gas on RSK. **Observe-track.** No ETH involved. |
+| **NIP-57 Zap** | Nostr Lightning payment event (tipping, micro-rewards). **Observe-track.** |
 | **Rating Ticket** | A formal ticket type for structured feedback after a completed transaction. Triggers a Nostr Kind 30024 event and COL-Points award upon mutual submission. |
 | **Return Ticket** | A ticket type for product returns and refund processes initiated by the buyer within the seller's defined return window. |
 
@@ -52,7 +57,7 @@ Bitcoin-native equivalents are listed at the bottom of this document.
 | Term | Definition |
 |------|-----------|
 | **COL-Points** | Off-chain, non-transferable reputation accumulation. Earned through protocol participation (completed tickets, reviews, governance). Cannot be purchased. |
-| **COLA Token** | Transferable governance token on RSK (Bitcoin sidechain). Used for token-weighted governance voting and staking. Not a currency — all payments remain in sats. |
+| **COLA Token** | Transferable governance token (planned on RSK / Bitcoin sidechain). Used for token-weighted governance voting and staking. Not a currency — all payments remain in sats. Token layer is **observe-track** (RSK not implemented; see [economic-protocol.md](governance/economic-protocol.md)). |
 | **Reputation Score** | A float (0.0–5.0) computed from star reviews, completion rate, dispute history, and COL-Points. Publicly visible on Nostr. |
 | **Soulbound Event** | A Nostr event that functions as a non-transferable credential (e.g. identity verification, mediator badge). Soulbound via pubkey binding. |
 

@@ -2,8 +2,10 @@
 
 This document tracks the status of every protocol specification. It is the authoritative source for knowing what is stable, what is in draft, and what is planned.
 
-**Current protocol version:** `v0.1.1-draft`
+**Current protocol version:** `v0.2.0-draft`
 **Target for `v1.0.0`:** All documents at `Stable` or `Accepted`, all open questions resolved.
+
+> **v0.2.0 "Truth-Reset":** This release re-aligns the specification with the reference implementation (the Colabonate App, the master). The escrow/payment architecture is rewritten to the **non-custodial** model (Direct-Pay + ICP Canister; custodial Hold-Invoices are now Legacy/flag-only). The Nostr DAO kind mapping (30022/30420–30423) is reconciled to the code. See [APP_ALIGNMENT_ANALYSIS.md](APP_ALIGNMENT_ANALYSIS.md) for the full gap analysis and roadmap.
 
 ---
 
@@ -29,11 +31,12 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 | [protocol-spec-v1.md](docs/protocols/core/protocol-spec-v1.md) | Draft | None |
 | [roles.md](docs/protocols/core/roles.md) | Draft | None |
 | [ticket-system.md](docs/protocols/core/ticket-system.md) | Draft | Ticket Types 7/8 Phase 2 |
-| [nostr-events.md](docs/protocols/core/nostr-events.md) | Draft | NIP registration pending |
-| [escrow-protocol.md](docs/protocols/core/escrow-protocol.md) | Draft | Stablecoin escrow denomination open (#1) |
-| [reputation-protocol.md](docs/protocols/core/reputation-protocol.md) | Draft | COL-Points cap TBD by DAO |
+| [nostr-events.md](docs/protocols/core/nostr-events.md) | Draft | DAO kind mapping reconciled to code (ADR-101/105/128); NIP registration pending |
+| [escrow-protocol.md](docs/protocols/core/escrow-protocol.md) | Draft | Non-custodial two-path model (ADR-253); legacy Hold-Invoice behind flag |
+| [escrow-canister-protocol.md](docs/protocols/core/escrow-canister-protocol.md) | Draft | NEW — ICP native-Bitcoin escrow (ADR-254); Mainnet pilot gated (FU-253-H) |
+| [reputation-protocol.md](docs/protocols/core/reputation-protocol.md) | Draft | COL-Points cap TBD by DAO; canonical model vs Whitepaper RSF unresolved |
 | [legal-binding-layer.md](docs/protocols/core/legal-binding-layer.md) | Draft | None |
-| [payment-architecture.md](docs/protocols/core/payment-architecture.md) | Draft | Open issues #1 #2 #3 |
+| [payment-architecture.md](docs/protocols/core/payment-architecture.md) | Draft | Non-custodial rails (ADR-253); Lightspark/RSK/Spark demoted to observe |
 | [security-model.md](docs/protocols/core/security-model.md) | Planned | — |
 | [protocol-versioning.md](docs/protocols/core/protocol-versioning.md) | Planned | — |
 
@@ -72,4 +75,4 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 
 
 
-*Last updated: 2026-04-24 | Colabonate Protocol v0.1.1-draft*
+*Last updated: 2026-08-05 | Colabonate Protocol v0.2.0-draft*

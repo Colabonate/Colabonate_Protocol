@@ -65,6 +65,16 @@ For larger changes (new protocol features, new workflows):
 → Create a GitHub issue
 → Create an ADR in `docs/decisions/` (template: `docs/decisions/TEMPLATE.md`)
 
+## Protocol Decision Changes (PDC Markers)
+
+When a specification change reflects a product/architecture decision made in the **reference implementation** (the Colabonate App, the master), mark it inline with a PDC reference so the source of truth stays traceable:
+
+```
+> (PDC: see ADR-NNN) — short description of the decision
+```
+
+The authoritative decisions live as ADRs in the Colabonate App repository. A PDC marker in this protocol repo points to the corresponding ADR number. This keeps the protocol synchronized with the implementation without duplicating the decision rationale.
+
 ## Status Tags
 
 Use consistent status tags in all documents:

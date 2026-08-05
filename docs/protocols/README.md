@@ -13,10 +13,11 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | 1 | [core/vision.md](core/vision.md) | Understand what the protocol is and isn't |
 | 2 | [core/protocol-spec-v1.md](core/protocol-spec-v1.md) | Technical overview and API |
 | 3 | [core/roles.md](core/roles.md) | Participant roles and permissions |
-| 4 | [core/nostr-events.md](core/nostr-events.md) | All event schemas (Kinds 30017–30026) |
+| 4 | [core/nostr-events.md](core/nostr-events.md) | All event schemas (Kinds 30017–30029, 30402–30423) |
 | 5 | [core/ticket-system.md](core/ticket-system.md) | Central interaction object |
-| 6 | [core/escrow-protocol.md](core/escrow-protocol.md) | Lightning escrow mechanics |
-| 7 | [GLOSSARY.md](GLOSSARY.md) | Canonical terms |
+| 6 | [core/escrow-protocol.md](core/escrow-protocol.md) | Non-custodial payment & escrow paths |
+| 7 | [core/escrow-canister-protocol.md](core/escrow-canister-protocol.md) | ICP native-Bitcoin escrow (Path 2) |
+| 8 | [GLOSSARY.md](GLOSSARY.md) | Canonical terms |
 
 ### For Buyers and Sellers (understanding trade workflows)
 
@@ -58,12 +59,14 @@ This directory contains the complete protocol specification for Colabonate. Docu
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [vision.md](core/vision.md) | Stable | Protocol philosophy and scope |
+| [vision.md](core/vision.md) | Draft | Protocol philosophy and scope |
 | [protocol-spec-v1.md](core/protocol-spec-v1.md) | Draft | Technical spec v1 |
 | [roles.md](core/roles.md) | Draft | Participant roles |
 | [ticket-system.md](core/ticket-system.md) | Draft | Ticket types and state machine |
-| [nostr-events.md](core/nostr-events.md) | Draft | Nostr event schemas 30017–30026 |
-| [escrow-protocol.md](core/escrow-protocol.md) | Draft | Lightning escrow |
+| [nostr-events.md](core/nostr-events.md) | Draft | Nostr event schemas (30017–30029, 30402–30423) |
+| [escrow-protocol.md](core/escrow-protocol.md) | Draft | Non-custodial payment & escrow (Direct-Pay + ICP) |
+| [escrow-canister-protocol.md](core/escrow-canister-protocol.md) | Draft | ICP native-Bitcoin escrow canister (Path 2) |
+| [payment-architecture.md](core/payment-architecture.md) | Draft | Bitcoin-native, non-custodial payment rails |
 | [reputation-protocol.md](core/reputation-protocol.md) | Draft | COL-Points and reviews |
 | [legal-binding-layer.md](core/legal-binding-layer.md) | Draft | Opt-in DAO+Codex binding |
 | security-model.md | Planned | Threat model |

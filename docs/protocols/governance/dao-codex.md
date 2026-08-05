@@ -129,7 +129,7 @@ Escrow impact: DAO Court verdicts are published as Kind 30019 events with `escro
 - Private keys never leave the client device
 - No custody — Colabonate holds no Bitcoin at any layer
 - All governance decisions are Nostr-signed and immutable on relay
-- Open source — protocol spec is CC BY 4.0; reference implementation is open source
+- Open source — protocol spec is MIT licensed; reference implementation is open source
 - Payment layer security: [escrow-protocol.md](../core/escrow-protocol.md)
 - Identity layer security: [identity-protocol.md](../identity/identity-protocol.md)
 

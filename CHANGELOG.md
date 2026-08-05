@@ -11,7 +11,37 @@ Format: [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH`
 
 ---
 
-## [0.1.1-draft] – 2026-04-24
+## [0.2.0-draft] – 2026-08-05 — "Truth-Reset" (re-align to reference implementation)
+
+> The reference implementation (Colabonate App) is the master for product decisions. This release re-aligns the specification to the architecture the app actually builds. Full gap analysis and forward roadmap: [APP_ALIGNMENT_ANALYSIS.md](APP_ALIGNMENT_ANALYSIS.md).
+
+### Changed — Escrow & Payment Architecture (PDC: ADR-253/254/245)
+- **`core/escrow-protocol.md`** — full rewrite to the **non-custodial two-path model**: Path 1 Direct-Pay (Lightning Address / NWC / Cashu P2PK, no platform custody, no own mint) and Path 2 ICP Escrow Canister (native Bitcoin via t-ECDSA). The earlier **custodial LNBits Hold-Invoice three-phase model is now [LEGACY]** — retained only as a documented, kill-flagged, never-public reference; its `EscrowStatus` vocabulary remains valid for that legacy path only.
+- **`core/escrow-canister-protocol.md`** — **NEW** normative spec for Path 2: `TradeState` machine (`PendingFunding → Funded → Released|Refunded|Disputed → DisputeSettled`), Candid interface, Nostr-signature authorization (no ICP wallets for users), t-ECDSA P2WPKH address derivation, payout invariant (buyer/seller/compile-time-fee only), permissionless timeout refund, milestone splits, reproducible build + blackhole/DAO controller.
+- **`core/payment-architecture.md`** — full rewrite: Direct-Pay as the launch rail, ICP canister as escrow, **Lightspark Grid / Spark Stablecoins / RSK / NIP-57 Zaps demoted to observe-tracks** (not implemented). Added wallet-provider matrix (NWC, Alby OAuth, Cashu, WebLN), the hard mint guardrail (no own mint), sovereign-key onboarding, global fiat-currency display (ADR-235).
+- **`governance/economic-protocol.md`** — fee model updated: **core commerce is permanently free** (ADR-245, not phase-limited); dispute fees (1%/2%) apply only on escalation; Path 2 canister fee is a compile-time constant set to 0 for the pilot. Added two-chamber governance reference (ADR-244).
+- **`core/ticket-system.md`** — added `escrowProvider` (`NONE | CUSTODIAL_LEGACY | ICP`) and `directPayRail` (`LN | CASHU`) fields (ADR-253/FU-253-E), and the `offerId`/`cooperationId` XOR note (ADR-204).
+
+### Changed — Nostr Interoperability (PDC: ADR-101/105/128)
+- **`core/nostr-events.md`** — reconciled the **DAO kind mapping to the reference code** (`kind-mapping.ts` / `dao-nostr.ts`), which is the Single Source of Truth:
+  - `30420` = **DAO Proposal** (was: "DAO Profile/Creation")
+  - `30421` = **DAO Vote** (was: "DAO Codex")
+  - `30422` = DAO Membership (unchanged)
+  - **`30423` = DAO Proposal Comment (NEW kind)**
+  - DAO creation / arbitration verdict published via **Kind 30022** (`sub_type`-governed).
+  - Extended the NIP-99 dual-publishing table with all legacy↔NIP-99 pairs (30020↔30409, 30021↔30405, 30024↔30406, 30027↔30404, 30028↔30414, 30029↔30415) and documented legacy cooperation kinds 30028/30029.
+
+### Changed — Editorial & Hygiene
+- **License contradiction resolved:** GLOSSARY/dao-codex references to "CC BY 4.0" corrected to **MIT** (matches README/LICENSE/CHANGELOG since 0.1.1).
+- **Status tags aligned:** `docs/protocols/README.md` vision status `Stable` → `Draft` (matches SPECIFICATION_STATUS); added the new escrow-canister-protocol document and updated kind ranges in the reading paths.
+- **GLOSSARY.md** — added Direct-Pay, ICP Escrow Canister, escrowProvider, Cashu, NWC; re-framed Lightspark/Spark/RSK/Codex Fork/Unified Wallet as observe-track/legacy; updated Escrow and Hold Invoice definitions.
+
+### Known follow-up (deferred to v0.3.0+, see APP_ALIGNMENT_ANALYSIS.md)
+Private Commerce (NIP-17/P, TradeVisibility, DisputeMode, PrivateArbiter); Cashu NIP-60/61 kinds (17375/7375/7376); GammaMarkets kinds (16/17, 31555); merchant prefs (31990); NIP-37 (30000/30003); extended auth methods (NIP-46/Email/MetaMask/Alby); appeal process; DAO typology; `security-model.md` and `protocol-versioning.md` (still Planned).
+
+---
+
+
 
 ### Changed (Decoupling Reference Implementation)
 - **Protocol Separation:** The repository has been strictly refocused as a public, open standard for the "Freedom of Interaction on Bitcoin" (similar to Nostr NIPs).
@@ -148,21 +178,19 @@ This release establishes the foundational protocol documents for community revie
 
 ---
 
-## Planned: [0.2.0] – Target Q2 2026
+## Planned: [0.3.0] — Product Domains & Mandatory Specs
 
-### Criteria for v0.2.0
-- Nostr event schemas (30017–30026) frozen — no breaking tag changes
-- Escrow state machine finalized
-- `vision.md` and `roles.md` moved to `spec/` (first stable documents)
-- GitHub Projects / Milestones / Issue Labels set up
-- Open Question #1 (Stablecoin escrow denomination) resolved or formally deferred
+> The original `0.2.0` plan (schema freeze, `spec/` directory, GitHub setup) was superseded by the **truth-reset** above: v0.2.0 prioritized re-aligning the spec to the built non-custodial architecture and the reconciled Nostr kinds. The items below are the v0.3.0 scope per [APP_ALIGNMENT_ANALYSIS.md](APP_ALIGNMENT_ANALYSIS.md) Workstream C/E.
 
-### To be added
-- `spec/` directory populated with first stable documents
-- `docs/protocols/core/security-model.md` — Threat model
+### To be added / specified
+- `docs/protocols/core/security-model.md` — Threat model + custody invariants
 - `docs/protocols/core/protocol-versioning.md` — Versioning for implementers
-- `docs/protocols/identity/proximity-proof.md` — Level 2 peer verification detail
-- ADRs 013–014
+- `core/private-commerce-protocol.md` — TradeVisibility, DisputeMode, PrivateArbiter, PayloadDisclosure (NIP-17/P)
+- Extended auth methods (NIP-46, Email magic-link, MetaMask/SIWE, Alby OAuth) in `identity-protocol.md`
+- Appeal process + private-dispute mode in `dispute-protocol.md`
+- DAO typology + membership modes in `dao-creation-protocol.md`
+- Additional Nostr kinds: Cashu (17375/7375/7376), GammaMarkets (16/17, 31555), merchant prefs (31990), NIP-37 (30000/30003)
+- PDC-Marker process documented in `CONTRIBUTING.md`
 
 ## Planned: [1.0.0] – Final Standard (no fixed date)
 
