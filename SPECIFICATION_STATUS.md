@@ -5,7 +5,7 @@ This document tracks the status of every protocol specification. It is the autho
 **Current protocol version:** `v0.2.0-draft`
 **Target for `v1.0.0`:** All documents at `Stable` or `Accepted`, all open questions resolved.
 
-> **v0.2.0 "Truth-Reset":** This release re-aligns the specification with the reference implementation (the Colabonate App, the master). The escrow/payment architecture is rewritten to the **non-custodial** model (Direct-Pay + ICP Canister; custodial Hold-Invoices are now Legacy/flag-only). The Nostr DAO kind mapping (30022/30420–30423) is reconciled to the code. See [APP_ALIGNMENT_ANALYSIS.md](APP_ALIGNMENT_ANALYSIS.md) for the full gap analysis and roadmap.
+> **v0.2.0 "Truth-Reset":** This release re-aligns the specification with the reference implementation (the Colabonate App, the master). The escrow/payment architecture is rewritten to the **non-custodial** model (Direct-Pay + ICP Canister; custodial Hold-Invoices are now Legacy/flag-only). The Nostr DAO kind mapping (30022/30420–30423) is reconciled to the code.
 
 ---
 

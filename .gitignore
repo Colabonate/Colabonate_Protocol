@@ -1,0 +1,12 @@
+# Internal working / analysis documents (not part of the protocol specification)
+APP_ALIGNMENT_ANALYSIS.md
+PROTOCOL_ALIGNMENT_RECORD.md
+
+# Editor / OS cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.bak

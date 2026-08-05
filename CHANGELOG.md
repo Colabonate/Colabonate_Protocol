@@ -11,12 +11,6 @@ Format: [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH`
 
 ---
 
-## [Dokumentation] – 2026-08-06 — Umsetzungs-Nachweis zur Protokoll-Revision
-
-- **`PROTOCOL_ALIGNMENT_RECORD.md`** — neues Begleitdokument zu `APP_ALIGNMENT_ANALYSIS.md`: hält die durchgeführte Angleichung des Protokolls an die App (v0.2.0 Truth-Reset + v0.2.1 Consistency Pass) fest — Auftrag, Quellen/Methode, gelieferte Arbeiten pro Datei, Verifikationsergebnisse, Git-Historie (Commits `40cf484`/`a4b3e47`) und offene Roadmap v0.3.0→v1.0.0.
-
----
-
 ## [0.2.1-draft] – 2026-08-05 — Consistency pass
 
 Aligns the remaining technical/workflow specs to the non-custodial architecture introduced in v0.2.0 (no content contradictions with the reference implementation).
@@ -33,7 +27,7 @@ Aligns the remaining technical/workflow specs to the non-custodial architecture 
 
 
 
-> The reference implementation (Colabonate App) is the master for product decisions. This release re-aligns the specification to the architecture the app actually builds. Full gap analysis and forward roadmap: [APP_ALIGNMENT_ANALYSIS.md](APP_ALIGNMENT_ANALYSIS.md).
+> The reference implementation (Colabonate App) is the master for product decisions. This release re-aligns the specification to the architecture the app actually builds (non-custodial payment & escrow).
 
 ### Changed — Escrow & Payment Architecture (PDC: ADR-253/254/245)
 - **`core/escrow-protocol.md`** — full rewrite to the **non-custodial two-path model**: Path 1 Direct-Pay (Lightning Address / NWC / Cashu P2PK, no platform custody, no own mint) and Path 2 ICP Escrow Canister (native Bitcoin via t-ECDSA). The earlier **custodial LNBits Hold-Invoice three-phase model is now [LEGACY]** — retained only as a documented, kill-flagged, never-public reference; its `EscrowStatus` vocabulary remains valid for that legacy path only.
@@ -56,7 +50,7 @@ Aligns the remaining technical/workflow specs to the non-custodial architecture 
 - **Status tags aligned:** `docs/protocols/README.md` vision status `Stable` → `Draft` (matches SPECIFICATION_STATUS); added the new escrow-canister-protocol document and updated kind ranges in the reading paths.
 - **GLOSSARY.md** — added Direct-Pay, ICP Escrow Canister, escrowProvider, Cashu, NWC; re-framed Lightspark/Spark/RSK/Codex Fork/Unified Wallet as observe-track/legacy; updated Escrow and Hold Invoice definitions.
 
-### Known follow-up (deferred to v0.3.0+, see APP_ALIGNMENT_ANALYSIS.md)
+### Known follow-up (deferred to v0.3.0+)
 Private Commerce (NIP-17/P, TradeVisibility, DisputeMode, PrivateArbiter); Cashu NIP-60/61 kinds (17375/7375/7376); GammaMarkets kinds (16/17, 31555); merchant prefs (31990); NIP-37 (30000/30003); extended auth methods (NIP-46/Email/MetaMask/Alby); appeal process; DAO typology; `security-model.md` and `protocol-versioning.md` (still Planned).
 
 ---
@@ -200,7 +194,7 @@ This release establishes the foundational protocol documents for community revie
 
 ## Planned: [0.3.0] — Product Domains & Mandatory Specs
 
-> The original `0.2.0` plan (schema freeze, `spec/` directory, GitHub setup) was superseded by the **truth-reset** above: v0.2.0 prioritized re-aligning the spec to the built non-custodial architecture and the reconciled Nostr kinds. The items below are the v0.3.0 scope per [APP_ALIGNMENT_ANALYSIS.md](APP_ALIGNMENT_ANALYSIS.md) Workstream C/E.
+> The original `0.2.0` plan (schema freeze, `spec/` directory, GitHub setup) was superseded by the **truth-reset** above: v0.2.0 prioritized re-aligning the spec to the built non-custodial architecture and the reconciled Nostr kinds. The items below are the v0.3.0 scope (Workstream C/E).
 
 ### To be added / specified
 - `docs/protocols/core/security-model.md` — Threat model + custody invariants
