@@ -1,12 +1,13 @@
 # Colabonate Nostr Event Kinds
 
 **Normativity:** Normative
-**Version:** 1.1.0-draft
-**Date:** 2026-08-05
-**Status:** [IMPLEMENTED] Kind 30017, 30018/30407, 30019/30408, 30020, 30021, 30022, 30024, 30027 (marketplace/governance/reputation) | [IMPLEMENTED] Kind 30414, 30415 (NIP-C cooperation) | [IMPLEMENTED] Kind 30420–30423 (DAO governance) | [PHASE 3] Kind 30023, 30026 (identity attestation/proximity) | [PHASE 4] Kind 30025 (COLA staking)
+**Version:** 1.2.0-draft
+**Date:** 2026-08-16
+**Status:** [IMPLEMENTED] Kind 30017, 30018/30407, 30019/30408, 30020, 30021, 30022, 30024, 30027 (marketplace/governance/reputation) | [IMPLEMENTED] Kind 30414, 30415 (NIP-C cooperation) | [IMPLEMENTED] Kind 30420–30423 (DAO governance) | [IMPLEMENTED] Kind 31922–31925 (NIP-52 bookable resources) | [PHASE 3] Kind 30023, 30026 (identity attestation/proximity) | [PHASE 4] Kind 30025 (COLA staking)
 
 > (PDC: see ADR-101) — NIP-15 conflict dual-publishing.
 > (PDC: see ADR-105/111/112/128) — DAO governance kinds.
+> (PDC: see ADR-271) — NIP-52 bookable resources (kinds 31922–31925), new in this release.
 
 ---
 
@@ -959,18 +960,18 @@ Published by Lightspark Grid (acting as LNURL server) after the Lightning paymen
 | `e` | No | Event that was zapped |
 | `preimage` | No | Payment preimage (proof of payment) |
 
+> **Not implemented.** No code in the reference app publishes or consumes Kind 9734/9735 zap events — this section describes an unbuilt design, retired as an observe-track item along with Lightspark Grid (PDC: see ADR-253). The `pubkey`/LNURL-server details below assumed a Lightspark Grid integration that was never built; if zaps are implemented, they would validate against whichever LN address/NWC/Cashu rail the recipient has configured, not a Lightspark-specific pubkey — see [payment-architecture.md](./payment-architecture.md).
+
 ### Colabonate-specific Zap Rules
 
 1. **COL-Points from Zaps** — In Phase 2+, zaps on completed tickets or reviews may contribute to COL-Points. The DAO sets the conversion rate per governance vote.
-2. **Lightspark Grid integration** — The `pubkey` of Kind 9735 receipts published via Lightspark Grid is the Lightspark LNURL server pubkey. Clients must validate this matches the Lightspark-registered pubkey for the recipient.
-3. **Zap receipt validation** — Clients should verify: `bolt11` invoice amount matches `amount` in Kind 9734; `description` hash in invoice matches the Kind 9734 event JSON; `preimage` satisfies the invoice payment hash.
-4. **Spam protection** — Zaps below 1 sat (< 1000 msats) are ignored for COL-Points purposes.
+2. **Zap receipt validation** — Clients should verify: `bolt11` invoice amount matches `amount` in Kind 9734; `description` hash in invoice matches the Kind 9734 event JSON; `preimage` satisfies the invoice payment hash.
+3. **Spam protection** — Zaps below 1 sat (< 1000 msats) are ignored for COL-Points purposes.
 
 ### Reference
 
 - [NIP-57 Specification](https://github.com/nostr-protocol/nostr/blob/master/57.md)
-- [Lightspark Grid](https://lightspark.com) — Performance layer providing LNURL-pay endpoint
-- [docs/protocols/core/payment-architecture.md](./payment-architecture.md) — Lightspark Grid integration context
+- [docs/protocols/core/payment-architecture.md](./payment-architecture.md) — Direct-Pay rails (LN address / NWC / Cashu)
 
 ---
 
@@ -1324,6 +1325,135 @@ Vote weight depends on the proposal's `voting_model` and the two-chamber governa
 ### Content
 
 Free-text comment. Markdown supported. Max 4096 characters.
+
+---
+
+## Booking Events (NIP-52)
+
+**Status:** [IMPLEMENTED] Kinds 31922, 31923, 31924, 31925 (PDC: see ADR-271, 2026-08-16)
+**Layer:** Bookable Resources / Time-Based Offers
+**Full workflow spec:** [workflows/booking-protocol.md](../workflows/booking-protocol.md)
+
+Unlike every other kind in this document, **31922–31925 are not an internal Colabonate convention** — they are [NIP-52](https://github.com/nostr-protocol/nips/blob/master/52.md) (Calendar Events), an existing, adopted NIP. No new kind was introduced for booking; Colabonate layers a small set of extension tags on top of the standard vocabulary (marked below), which unaware NIP-52 clients simply ignore.
+
+### Kind 31924 — Calendar
+
+One per bookable resource; addressable list of the resource's availability occurrences.
+
+```json
+{
+  "kind": 31924,
+  "pubkey": "<resource-owner-pubkey>",
+  "tags": [
+    ["d", "<resource-calendarD>"],
+    ["title", "<resource-title>"],
+    ["a", "31922:<owner-pubkey>:<occurrence-d>"],
+    ["a", "31923:<owner-pubkey>:<occurrence-d>"]
+  ],
+  "content": ""
+}
+```
+
+### Kind 31922 — Date-Based Calendar Event (SPACE)
+
+Timezone-less date range, per NIP-52 (correct for nights — a stay is a date, not an instant). Used for **both** an availability occurrence and a seller-countersigned booking, discriminated by the `booking` tag (Colabonate extension).
+
+```json
+{
+  "kind": 31922,
+  "pubkey": "<resource-owner-pubkey>",
+  "tags": [
+    ["d",        "<occurrence-or-booking-id>"],
+    ["title",    "<title>"],
+    ["start",    "<YYYY-MM-DD>"],
+    ["end",      "<YYYY-MM-DD, exclusive>"],
+    ["a",        "31924:<owner-pubkey>:<calendarD>"],
+    ["booking",  "availability" | "confirmed"],
+    ["capacity", "<N>"],
+    ["unit",     "per_night" | "per_day" | "per_hour" | "per_seat" | "flat"],
+    ["price",    "<sats>", "sats"],
+    ["units",    "<N>"],
+    ["e",        "<rsvp-event-id>"],
+    ["p",        "<buyer-pubkey>"],
+    ["offer",    "<offer-id>"]
+  ],
+  "content": ""
+}
+```
+
+`booking: "availability"` events omit `e`/`p` (no buyer yet) and carry `capacity`/`unit`/`price` for the whole occurrence. `booking: "confirmed"` events (the seller's countersignature — the *only* thing that makes a booking exist, see [booking-protocol.md](../workflows/booking-protocol.md)) carry `e` (the buyer's RSVP event id) and `p` (the buyer's pubkey), and `units` means booked units rather than available capacity.
+
+### Kind 31923 — Time-Based Calendar Event (SESSION)
+
+Same discrimination as 31922, but UTC instants plus `start_tzid` per NIP-52 (correct for fixed-time occurrences like workshops).
+
+```json
+{
+  "kind": 31923,
+  "pubkey": "<resource-owner-pubkey>",
+  "tags": [
+    ["d",          "<occurrence-or-booking-id>"],
+    ["title",      "<title>"],
+    ["start",      "<unix-seconds>"],
+    ["end",        "<unix-seconds, exclusive>"],
+    ["start_tzid", "<IANA timezone, e.g. Europe/Berlin>"],
+    ["a",          "31924:<owner-pubkey>:<calendarD>"],
+    ["booking",    "availability" | "confirmed"],
+    ["capacity",   "<N>"],
+    ["unit",       "per_night" | "per_day" | "per_hour" | "per_seat" | "flat"],
+    ["price",      "<sats>", "sats"],
+    ["units",      "<N>"],
+    ["D",          "<day-number, one per calendar day the interval spans>"],
+    ["e",          "<rsvp-event-id>"],
+    ["p",          "<buyer-pubkey>"],
+    ["offer",      "<offer-id>"]
+  ],
+  "content": ""
+}
+```
+
+### Kind 31925 — Calendar Event RSVP (Booking Request)
+
+The buyer's booking request. Not itself a commitment — see [booking-protocol.md § Booking is a two-message exchange](../workflows/booking-protocol.md).
+
+```json
+{
+  "kind": 31925,
+  "pubkey": "<buyer-pubkey>",
+  "tags": [
+    ["d",      "<rsvp-id>"],
+    ["a",      "31922:<owner-pubkey>:<occurrence-d>"],
+    ["e",      "<occurrence-event-id>"],
+    ["status", "accepted" | "declined" | "tentative"],
+    ["fb",     "busy"],
+    ["units",  "<N>"],
+    ["p",      "<seller-pubkey>"],
+    ["start",  "<YYYY-MM-DD, SPACE sub-range only>"],
+    ["end",    "<YYYY-MM-DD, SPACE sub-range only, exclusive>"],
+    ["offer",  "<offer-id>"]
+  ],
+  "content": ""
+}
+```
+
+For `PRIVATE`-visibility offers, this event is designed to travel NIP-17 gift-wrapped instead of publishing openly (PDC: see ADR-152) — **not implemented in v1** (FU-271-I); it currently publishes openly regardless of offer visibility.
+
+### Colabonate Extension Tags (unknown to plain NIP-52 clients, safely ignored)
+
+| Tag | Values | Meaning |
+|-----|--------|---------|
+| `booking` | `availability` \| `confirmed` | Discriminates an open occurrence from the seller's binding countersignature |
+| `capacity` | integer | Units (SPACE) or seats (SESSION) available on this occurrence |
+| `unit` | `per_night`\|`per_day`\|`per_hour`\|`per_seat`\|`flat` | Pricing unit |
+| `price` | sats amount | Price per unit |
+| `units` | integer | Requested (RSVP) or booked (confirmation) units/seats |
+| `offer` | Colabonate offer id | Optional link back to the selling offer — the reverse link (offer → calendar) is not yet published on the Kind 30402 offer event itself, a known gap (FU-276-B) |
+
+### Reference
+
+- [NIP-52 Specification](https://github.com/nostr-protocol/nips/blob/master/52.md)
+- [workflows/booking-protocol.md](../workflows/booking-protocol.md) — full booking workflow, availability derivation, server role, payment status
+- ADR-271 (PDC) — source of truth for this schema
 
 ---
 

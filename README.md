@@ -2,9 +2,9 @@
 
 > An open protocol standard for decentralized trade and cooperation via Bitcoin Lightning.
 
-**Status:** `v0.2.0-draft` — Active development. Community input welcome. Not yet a finalized standard.
+**Status:** `v0.4.0-draft` — Active development. Community input welcome. Not yet a finalized standard.
 
-[![Specification Status](https://img.shields.io/badge/spec-v0.2.0--draft-yellow)](SPECIFICATION_STATUS.md)
+[![Specification Status](https://img.shields.io/badge/spec-v0.4.0--draft-yellow)](SPECIFICATION_STATUS.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Bitcoin-only](https://img.shields.io/badge/Bitcoin-only-orange)](docs/decisions/007-protocol-documentation-bitcoin-only.md)
 
@@ -21,7 +21,7 @@ Anyone with a Lightning wallet can:
 - Build reputation through verifiable, non-transferable credentials
 - Participate in community governance via Nostr-based voting
 
-This repository contains the **protocol specification** and supporting documentation. It is maintained by the Colabonate Foundation and licensed under the MIT License.
+This repository contains the **protocol specification** and supporting documentation. It is maintained by the Colabonate Foundation and licensed under the MIT License. The positioning papers (whitepaper, ISO 20022 complementary layer) that also live in this repository are licensed separately — see [License](#license) below.
 
 **The goal of this repository:** Through open development and community review, reach `v1.0.0` — a stable, implementer-ready protocol standard.
 
@@ -37,6 +37,7 @@ This repository contains the **protocol specification** and supporting documenta
 | **Marketplace** | Nostr Kind 30017 Offers | [sell-protocol.md](docs/protocols/workflows/sell-protocol.md) |
 | **Payments** | Lightning / Cashu / ICP (non-custodial) | [payment-architecture.md](docs/protocols/core/payment-architecture.md) |
 | **Escrow** | ICP Canister (native BTC) + Direct-Pay | [escrow-protocol.md](docs/protocols/core/escrow-protocol.md) · [escrow-canister-protocol.md](docs/protocols/core/escrow-canister-protocol.md) |
+| **Bookable Resources** | NIP-52 Calendar Events (Kinds 31922–31925) | [booking-protocol.md](docs/protocols/workflows/booking-protocol.md) |
 | **Reputation** | COL-Points + Nostr Reviews | [reputation-protocol.md](docs/protocols/core/reputation-protocol.md) |
 | **Governance** | Nostr Votes + DAO Codex | [dao-codex.md](docs/protocols/governance/dao-codex.md) |
 
@@ -72,6 +73,7 @@ To build a Colabonate-compatible client, read in this order:
 5. [Ticket System](docs/protocols/core/ticket-system.md) — The central interaction object
 6. [Escrow Protocol](docs/protocols/core/escrow-protocol.md) — Non-custodial payment & escrow paths
 7. [Escrow Canister Protocol](docs/protocols/core/escrow-canister-protocol.md) — ICP native-Bitcoin escrow (Path 2)
+8. [Booking Protocol](docs/protocols/workflows/booking-protocol.md) — Bookable resources, time-based offers (NIP-52)
 8. [Glossary](docs/protocols/GLOSSARY.md) — Canonical term definitions
 
 ---
@@ -152,9 +154,12 @@ Contributions to the protocol specification are welcome. Please read [CONTRIBUTI
 
 | Content | License |
 |---------|---------|
-| Protocol documentation | [MIT License](LICENSE) |
+| Protocol documentation (`docs/protocols/`) | [MIT License](LICENSE) |
+| Positioning papers — whitepaper, ISO 20022 complementary layer (`colabonate_whitepaper_*`, `Colabonate_ISO20022_Complementary_Layer_*`) | [CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/) |
 
-The Colabonate Protocol specification is freely available for use, adaptation, and implementation under the terms of the MIT License.
+The Colabonate Protocol specification is freely available for use, adaptation, and implementation under the terms of the MIT License, to encourage adoption as an open standard.
+
+The positioning papers are licensed under CC BY-ND 4.0 (no derivatives) instead — their wording is the basis of a prior-art / defensive-publication claim, so their text must stay unmodified and unredistributed-under-another-name to keep that evidentiary value intact.
 
 ---
 

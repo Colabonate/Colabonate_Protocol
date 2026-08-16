@@ -11,6 +11,47 @@ Format: [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH`
 
 ---
 
+## [0.4.0-draft] – 2026-08-16 — Bookable Resources / NIP-52 (ADR-270/271/272 catch-up)
+
+The app repo's `ADR-270` (Product Attributes and Variants) and `ADR-271` (Bookable Resources and Time-Based Offers via NIP-52) both shipped real, tested code — but neither had ever been documented in `docs/protocols/`, in *either* repo. This release ports the app repo's own catch-up work (its `ADR-276`) into this repo, so there was no drift to close on the app-repo side first this time — both repos now describe the same content, adapted for this repo's PDC-marker/no-internal-links convention as usual.
+
+A third companion decision, `ADR-272` (deposits, cancellation policy, refunds for bookings), is **proposed only — zero code**. Every document touched by this release states that explicitly, table by table, rather than presenting the design as shipped behavior: a booking today pays and cancels exactly like any other ticket, with no deposit option and no stated cancellation policy.
+
+### Added
+- **`workflows/booking-protocol.md`** — new normative spec: `BookableResource` entity, derived-availability model (open windows − blackouts − confirmed bookings, no materialized free/busy table), the NIP-52 two-message exchange (buyer RSVP kind 31925 → seller countersignature kind 31922/31923 — the countersignature being the *only* thing that makes a booking exist), server's index/advisory-hold-only role, the two confirmation modes (manual default, NIP-46-delegate auto-confirm — flagged FU-271-H, not built), interval/capacity/timezone semantics, and a dedicated payment section marking every ADR-272 concept 🔴 not implemented. Also documents a real gap: the Kind 30402 offer event never gains the `a` tag pointing at its resource's calendar that ADR-271 specifies (FU-276-B).
+- **`core/nostr-events.md` § Booking Events (NIP-52)** — full tag schemas for kinds 31922 (SPACE), 31923 (SESSION), 31924 (Calendar), 31925 (RSVP), plus the Colabonate extension-tag table (`booking`, `capacity`, `unit`, `price`, `units`, `offer`). Explicitly noted as an *adopted* NIP (NIP-52), not part of the internal 30017–30027 convention.
+
+### Changed
+- **`core/ticket-system.md`** — added `Ticket.variantLabel` (ADR-270) with its denormalization rationale; added a note that booking tickets carry no booking-specific fields of their own (state lives on `BookableResource`/`Booking`, not `Ticket`) plus the same "ADR-272 not implemented" honesty note as `booking-protocol.md`.
+- **`core/nostr-events.md`** — fixed a stale NIP-57 Zaps section describing a Lightspark Grid LNURL-server integration that was never built (same correction already applied to `payment-architecture.md` in `v0.2.0`, missed in this file at the time).
+
+### Not changed (deliberately)
+- Kind 30420–30423 DAO-governance sections are untouched. This repo's mapping (Proposal/Vote/Membership/Comment) already differs from what the app repo's own `nostr-events.md` currently says on the same three kinds — the app repo flagged its own copy as stale (`FU-276-A`) rather than assuming this repo's version is correct by default, and that verification hasn't happened yet. Revisit together, not by porting one side's assumption into the other.
+
+---
+
+## [0.3.0-draft] – 2026-08-16 — Two new specification documents ported from the app repo
+
+The app repo's `docs/protocols/` carried two documents this repo never received when it was first split off: `core/openness-model.md` (the three-layer Protocol/Coordination/Client architecture — genuinely public-facing normative-boundary content) and `governance/dao-technology-stack.md` (a non-normative "at a glance" reference summary of the DAO's technology stack). Both were refreshed against the current architecture before porting (both predated `ADR-253` and still described Lightning Hold Invoices as the live escrow enforcement mechanism), then adapted for this repo's conventions: internal app-repo file paths removed, deep ADR file links replaced with `(PDC: see ADR-NNN)` markers / generic GitHub-org links, `FOLLOWUPS.md` cross-references converted to plain-text `FU-NNN` mentions (this repo has no `FOLLOWUPS.md` of its own).
+
+### Added
+- **`core/openness-model.md`** — three-layer architecture (Protocol Layer normative / Coordination Layer reference-server-only / Client Layer open). Kind range extended to 30423; payment/escrow mechanics updated from "Lightning Hold Invoices" to Direct-Pay + ICP Canister (PDC: see ADR-253/254). Indexed in `docs/protocols/README.md` (reading path + document index) and `SPECIFICATION_STATUS.md`.
+- **`governance/dao-technology-stack.md`** — "at a glance" DAO tech-stack summary (not normative). Enforcement description corrected from Lightning-Hold-Invoice-only to the three actual paths (Direct-Pay = reputation only, legacy Hold-Invoice = kill-switched, ICP Canister = BIP-340-signed `submit_dao_verdict`, not yet app-wired); RSK reframed from "Phase 4 deferred" to "evaluated and parked" per ADR-253. Indexed in `docs/protocols/README.md` and `SPECIFICATION_STATUS.md`.
+
+### Known gap (not closed by this release)
+- `ADR-270` (Product Attributes & Variants), `ADR-271` (Bookable Resources / NIP-52, Nostr kinds 31922–31925), and `ADR-272` (Booking & Inventory Commerce, `DEPOSIT_PAID` status, cancellation tiers) shipped in the app repo (2026-08-15/16) but have **no corresponding specification in either repo yet** — not even the app repo's own `docs/protocols/` documents them. Nothing to port until that source content is authored.
+
+---
+
+## [0.2.2-draft] – 2026-08-16 — `escrowProvider` confirmed implemented (app-repo sync)
+
+`v0.2.0` documented `Ticket.escrowProvider` in `core/ticket-system.md` as part of the Truth-Reset, ahead of the reference app actually having the field — a forward-looking spec addition rather than a description of shipped code. The Colabonate App repo has since added the field for real (`ADR-275`, closing `FU-253-E`): a real Prisma column + migration, an `EscrowProviderSchema` zod validator, and wiring at both places a `Ticket` is created with an escrow concept (offer checkout and cooperation `fund-escrow`). This release corrects this spec's own framing to match — from "new, planned" to "confirmed implemented" — and adds one fact the app-repo audit surfaced that this spec didn't have: cooperation-funded escrow tickets run through `CUSTODIAL_LEGACY` **unconditionally**, with no equivalent to the offer-escrow `ESCROW_ENABLED` kill-switch. No architectural change — the two-path model from `v0.2.0` is unchanged; this is a correction to keep the spec from claiming more certainty about the app's code than was true, in the direction the repo's own stated philosophy requires (app is master, spec follows).
+
+### Changed
+- **`core/ticket-system.md`** — `escrowProvider`/`directPayRail` Prisma-snippet comments no longer say "NEW"; note they're confirmed implemented via ADR-275. `directPayRail`'s value set corrected to include `DEMO` (Beta-only rail, previously omitted). Callout paragraph expanded: no code sets `escrowProvider = ICP` yet (Path 2 has no server-side canister wiring), and the cooperation-`fund-escrow` kill-switch gap is now named explicitly rather than left implicit.
+
+---
+
 ## [0.2.1-draft] – 2026-08-05 — Consistency pass
 
 Aligns the remaining technical/workflow specs to the non-custodial architecture introduced in v0.2.0 (no content contradictions with the reference implementation).

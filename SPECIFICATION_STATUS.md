@@ -2,10 +2,14 @@
 
 This document tracks the status of every protocol specification. It is the authoritative source for knowing what is stable, what is in draft, and what is planned.
 
-**Current protocol version:** `v0.2.0-draft`
+**Current protocol version:** `v0.4.0-draft`
 **Target for `v1.0.0`:** All documents at `Stable` or `Accepted`, all open questions resolved.
 
 > **v0.2.0 "Truth-Reset":** This release re-aligns the specification with the reference implementation (the Colabonate App, the master). The escrow/payment architecture is rewritten to the **non-custodial** model (Direct-Pay + ICP Canister; custodial Hold-Invoices are now Legacy/flag-only). The Nostr DAO kind mapping (30022/30420–30423) is reconciled to the code.
+>
+> **v0.3.0:** Two new documents ported from the app repo (`core/openness-model.md`, `governance/dao-technology-stack.md`), refreshed to the non-custodial model before porting.
+>
+> **v0.4.0:** New `workflows/booking-protocol.md` and a new "Booking Events (NIP-52)" section in `nostr-events.md` (kinds 31922–31925) — bookable resources / time-based offers, ported from the app repo where they were built but never previously documented in either repo. `ticket-system.md` gains `variantLabel`. Deposits/cancellation policy are explicitly documented as **proposed, not implemented**. See [CHANGELOG.md](CHANGELOG.md) for the full v0.2.2/v0.3.0/v0.4.0 entries.
 
 ---
 
@@ -30,13 +34,14 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 | [vision.md](docs/protocols/core/vision.md) | Draft | None |
 | [protocol-spec-v1.md](docs/protocols/core/protocol-spec-v1.md) | Draft | None |
 | [roles.md](docs/protocols/core/roles.md) | Draft | None |
-| [ticket-system.md](docs/protocols/core/ticket-system.md) | Draft | Ticket Types 7/8 Phase 2 |
-| [nostr-events.md](docs/protocols/core/nostr-events.md) | Draft | DAO kind mapping reconciled to code (ADR-101/105/128); NIP registration pending |
+| [ticket-system.md](docs/protocols/core/ticket-system.md) | Draft | Ticket Types 7/8 Phase 2; `variantLabel` (ADR-270) added |
+| [nostr-events.md](docs/protocols/core/nostr-events.md) | Draft | DAO kind mapping reconciled to code (ADR-101/105/128); NIP-52 booking kinds 31922–31925 added (ADR-271); NIP registration pending |
 | [escrow-protocol.md](docs/protocols/core/escrow-protocol.md) | Draft | Non-custodial two-path model (ADR-253); legacy Hold-Invoice behind flag |
 | [escrow-canister-protocol.md](docs/protocols/core/escrow-canister-protocol.md) | Draft | NEW — ICP native-Bitcoin escrow (ADR-254); Mainnet pilot gated (FU-253-H) |
 | [reputation-protocol.md](docs/protocols/core/reputation-protocol.md) | Draft | COL-Points cap TBD by DAO; canonical model vs Whitepaper RSF unresolved |
 | [legal-binding-layer.md](docs/protocols/core/legal-binding-layer.md) | Draft | None |
 | [payment-architecture.md](docs/protocols/core/payment-architecture.md) | Draft | Non-custodial rails (ADR-253); Lightspark/RSK/Spark demoted to observe |
+| [openness-model.md](docs/protocols/core/openness-model.md) | Draft | NEW — three-layer architecture (Protocol/Coordination/Client), what implementers must vs need not build |
 | [security-model.md](docs/protocols/core/security-model.md) | Planned | — |
 | [protocol-versioning.md](docs/protocols/core/protocol-versioning.md) | Planned | — |
 
@@ -58,6 +63,7 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 | [buy-protocol.md](docs/protocols/workflows/buy-protocol.md) | Draft | Phase 1 core flow |
 | [sell-protocol.md](docs/protocols/workflows/sell-protocol.md) | Draft | Phase 1 core flow |
 | [cooperation-protocol.md](docs/protocols/workflows/cooperation-protocol.md) | Draft | Phase 2 design |
+| [booking-protocol.md](docs/protocols/workflows/booking-protocol.md) | Draft | NEW — implemented in code (ADR-271); payment/cancellation (ADR-272) proposed, not built |
 | [dispute-protocol.md](docs/protocols/workflows/dispute-protocol.md) | Draft | Phase 4 design |
 
 ---
@@ -70,9 +76,10 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 | [dao-creation-protocol.md](docs/protocols/governance/dao-creation-protocol.md) | Draft | COLA stake threshold TBD |
 | [economic-protocol.md](docs/protocols/governance/economic-protocol.md) | Draft | Token minting governance vote TBD |
 | [governance-roadmap.md](docs/protocols/governance/governance-roadmap.md) | Draft | Living document |
+| [dao-technology-stack.md](docs/protocols/governance/dao-technology-stack.md) | Draft | NEW — reference summary, not normative; COLA execution venue undecided |
 
 ---
 
 
 
-*Last updated: 2026-08-05 | Colabonate Protocol v0.2.0-draft*
+*Last updated: 2026-08-16 | Colabonate Protocol v0.4.0-draft*

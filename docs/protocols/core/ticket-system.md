@@ -2,8 +2,8 @@
 
 **Normativity:** Normative
 
-**Version:** 1.0.0-draft
-**Date:** 2026-04-18
+**Version:** 1.1.0-draft
+**Date:** 2026-08-16
 **Status:** [IMPLEMENTED] Phase 1 ticket flow (PENDING → IN_PROGRESS → COMPLETED/DISPUTED/CANCELLED) | [IMPLEMENTED] Ticket types SMART_ORDER, MILESTONE, DISPUTE, GOVERNANCE, VERIFICATION, ROYALTY | [IMPLEMENTED] OfferType SERVICE, PRODUCT, ITEM, COOP (ADR-022, ADR-066, ADR-113) | [IMPLEMENTED] Extended statuses PAID (ADR-121), ARBITRATION_LOST/WON (ADR-125/126) | [RESERVED] INTEREST_SENT (ADR-129, PROB-001)
 
 ---
@@ -76,8 +76,9 @@ model Ticket {
   codexHash        String?      // SHA-256 of Codex at binding time
   codexVersion     String?      // Human-readable Codex version (e.g. "1.2")
   escrowStatus     String       @default("NONE") // Volatile: EscrowStatus values, zod-validated
-  escrowProvider   String       @default("NONE") // NEW (ADR-253/FU-253-E): NONE | CUSTODIAL_LEGACY | ICP
-  directPayRail    String?      // NEW (ADR-253): LN | CASHU (only when escrowProvider = NONE)
+  escrowProvider   String       @default("NONE") // (ADR-253/FU-253-E): NONE | CUSTODIAL_LEGACY | ICP — confirmed implemented in the reference app (ADR-275)
+  directPayRail    String?      // (ADR-253): LN | CASHU | DEMO (Beta only) — set only when escrowProvider = NONE
+  variantLabel     String?      // (ADR-270): frozen variant description, e.g. "Size: M · Colour: blue"
   
   // Escrow phase invoices (legacy Hold-Invoice path only)
   phase1Invoice    String?
@@ -112,7 +113,11 @@ enum TicketType {
 >
 > (PDC: see ADR-124)
 
-> **⚠️ `escrowProvider` / `directPayRail` (ADR-253 / FU-253-E):** A ticket discriminates its payment/escrow path via `escrowProvider` (`NONE | CUSTODIAL_LEGACY | ICP`). The legacy `escrowStatus` vocabulary (above) is coupled to the **CUSTODIAL_LEGACY** Hold-Invoice machine; Path 1 (Direct-Pay, `escrowProvider = NONE`) and Path 2 (ICP canister, `escrowProvider = ICP`) use the canister `TradeState` / Direct-Pay flow instead — see [escrow-protocol.md](./escrow-protocol.md). When `escrowProvider = NONE`, `directPayRail` indicates which Direct-Pay rail applies (`LN` or `CASHU`). The ticket also enforces an XOR: exactly one of `offerId` or `cooperationId` is set (cooperation tickets have no offer; PDC: see ADR-204).
+> **⚠️ `escrowProvider` / `directPayRail` (ADR-253 / FU-253-E, confirmed implemented in the app via ADR-275):** A ticket discriminates its payment/escrow path via `escrowProvider` (`NONE | CUSTODIAL_LEGACY | ICP`). The legacy `escrowStatus` vocabulary (above) is coupled to the **CUSTODIAL_LEGACY** Hold-Invoice machine; Path 1 (Direct-Pay, `escrowProvider = NONE`) and Path 2 (ICP canister, `escrowProvider = ICP`) use the canister `TradeState` / Direct-Pay flow instead — see [escrow-protocol.md](./escrow-protocol.md). When `escrowProvider = NONE`, `directPayRail` indicates which Direct-Pay rail applies (`LN`, `CASHU`, or `DEMO` in Beta mode). No app code sets `escrowProvider = ICP` yet — Path 2 has no server-side wiring to the canister (see [escrow-canister-protocol.md](./escrow-canister-protocol.md) §11). Every `CUSTODIAL_LEGACY` ticket created today goes through offer-escrow (behind the `ESCROW_ENABLED` kill-switch) **or** cooperation funding (`fund-escrow`, unconditionally — that route has no equivalent kill-switch, a real gap, not a design choice). The ticket also enforces an XOR: exactly one of `offerId` or `cooperationId` is set (cooperation tickets have no offer; PDC: see ADR-204).
+
+> **⚠️ `variantLabel` (PDC: see ADR-270):** frozen at ticket creation from the child offer's `variantValues` (e.g. a `productType='variation'` offer with `{size: "M", colour: "blue"}` → `"Size: M · Colour: blue"`). Deliberately denormalized — the buyer's order confirmation, the dispute record, and the seller's fulfilment view must state what was actually bought even after the seller renames an axis value or hides the variant; a live join cannot promise that. `Offer.productType`/`parentOfferId`/`variantAxes`/`variantValues` are Offer-side fields, not part of this document's `Ticket` schema — no dedicated protocol document for the Offer/catalog schema exists yet.
+>
+> **Bookable resources (PDC: see ADR-271):** a ticket for a bookable offer carries no booking-specific fields of its own — booking state lives on separate `BookableResource`/`Booking` entities and the seller's countersigned NIP-52 event, not on `Ticket`. See [workflows/booking-protocol.md](../workflows/booking-protocol.md) for the full booking workflow, including the explicit note that deposits/cancellation policy (PDC: see ADR-272) are **designed but not implemented** — no `DEPOSIT_PAID` status or cancellation-tier field exists in the current schema.
 
 **OfferType Behavior:**
 

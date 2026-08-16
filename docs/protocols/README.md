@@ -11,9 +11,10 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | Step | Document | Why |
 |------|----------|-----|
 | 1 | [core/vision.md](core/vision.md) | Understand what the protocol is and isn't |
+| 1a | [core/openness-model.md](core/openness-model.md) | What you MUST implement (Protocol Layer) vs. what's reference-server-only (Coordination Layer) |
 | 2 | [core/protocol-spec-v1.md](core/protocol-spec-v1.md) | Technical overview and API |
 | 3 | [core/roles.md](core/roles.md) | Participant roles and permissions |
-| 4 | [core/nostr-events.md](core/nostr-events.md) | All event schemas (Kinds 30017–30029, 30402–30423) |
+| 4 | [core/nostr-events.md](core/nostr-events.md) | All event schemas (Kinds 30017–30029, 30402–30423, 31922–31925) |
 | 5 | [core/ticket-system.md](core/ticket-system.md) | Central interaction object |
 | 6 | [core/escrow-protocol.md](core/escrow-protocol.md) | Non-custodial payment & escrow paths |
 | 7 | [core/escrow-canister-protocol.md](core/escrow-canister-protocol.md) | ICP native-Bitcoin escrow (Path 2) |
@@ -26,6 +27,7 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | [workflows/buy-protocol.md](workflows/buy-protocol.md) | How to buy: discovery → payment → completion |
 | [workflows/sell-protocol.md](workflows/sell-protocol.md) | How to sell: offer creation → fulfillment |
 | [workflows/cooperation-protocol.md](workflows/cooperation-protocol.md) | Multi-party project collaboration |
+| [workflows/booking-protocol.md](workflows/booking-protocol.md) | Bookable resources: time-based offers, NIP-52 calendars |
 | [workflows/dispute-protocol.md](workflows/dispute-protocol.md) | What happens when something goes wrong |
 
 ### For Governance and DAO Participants
@@ -63,10 +65,11 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | [protocol-spec-v1.md](core/protocol-spec-v1.md) | Draft | Technical spec v1 |
 | [roles.md](core/roles.md) | Draft | Participant roles |
 | [ticket-system.md](core/ticket-system.md) | Draft | Ticket types and state machine |
-| [nostr-events.md](core/nostr-events.md) | Draft | Nostr event schemas (30017–30029, 30402–30423) |
+| [nostr-events.md](core/nostr-events.md) | Draft | Nostr event schemas (30017–30029, 30402–30423, 31922–31925) |
 | [escrow-protocol.md](core/escrow-protocol.md) | Draft | Non-custodial payment & escrow (Direct-Pay + ICP) |
 | [escrow-canister-protocol.md](core/escrow-canister-protocol.md) | Draft | ICP native-Bitcoin escrow canister (Path 2) |
 | [payment-architecture.md](core/payment-architecture.md) | Draft | Bitcoin-native, non-custodial payment rails |
+| [openness-model.md](core/openness-model.md) | Draft | Three-layer architecture: Protocol (normative) / Coordination (reference-server) / Client (open) |
 | [reputation-protocol.md](core/reputation-protocol.md) | Draft | COL-Points and reviews |
 | [legal-binding-layer.md](core/legal-binding-layer.md) | Draft | Opt-in DAO+Codex binding |
 | security-model.md | Planned | Threat model |
@@ -86,6 +89,7 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | [buy-protocol.md](workflows/buy-protocol.md) | Phase 1 | Buyer flow |
 | [sell-protocol.md](workflows/sell-protocol.md) | Phase 1 | Seller flow |
 | [cooperation-protocol.md](workflows/cooperation-protocol.md) | Phase 2 | Multi-party cooperation |
+| [booking-protocol.md](workflows/booking-protocol.md) | Draft (implemented in code) | Bookable resources, time-based offers (NIP-52) |
 | [dispute-protocol.md](workflows/dispute-protocol.md) | Phase 4 | Conflict resolution |
 
 ### governance/
@@ -96,6 +100,7 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | [dao-creation-protocol.md](governance/dao-creation-protocol.md) | Phase 4 | User-created DAOs |
 | [economic-protocol.md](governance/economic-protocol.md) | Phase 4 | COLA token and fees |
 | [governance-roadmap.md](governance/governance-roadmap.md) | Living | Phase-by-phase roadmap |
+| [dao-technology-stack.md](governance/dao-technology-stack.md) | Draft | At-a-glance: DAO tech stack, why no general-purpose blockchain |
 
 ---
 
