@@ -214,7 +214,7 @@ The protocol version is declared in Nostr Kind 0 profile metadata:
 }
 ```
 
-Breaking changes (Nostr schema changes) → major version bump. Full versioning policy (semver rules, deprecation windows, CHANGELOG location) is specified inline in this document (see the `Versioning` section above) and tracked in [CHANGELOG.md](../CHANGELOG.md).
+Breaking changes (Nostr schema changes) → major version bump. Full versioning policy (semver rules, deprecation windows, CHANGELOG location) is specified inline in this document (see the `Versioning` section above) and tracked in [CHANGELOG.md](../../../CHANGELOG.md).
 
 ---
 

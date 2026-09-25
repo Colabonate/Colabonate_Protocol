@@ -19,7 +19,7 @@ Two layers work together:
 
 ### 1. `StandardCategory` — the on-chain-adjacent source of truth
 
-Prisma model in [prisma/schema.prisma:333](../../../prisma/schema.prisma):
+Prisma model in `prisma/schema.prisma:333` (reference implementation):
 
 | Field | Purpose |
 |-------|---------|
@@ -46,7 +46,7 @@ Not a separate schema, but the **single source of truth for top-level UX** (per 
 
 ## Offer Binding
 
-Offer model carries both a legacy and a canonical field ([prisma/schema.prisma:154–157](../../../prisma/schema.prisma)):
+Offer model carries both a legacy and a canonical field (`prisma/schema.prisma:154–157` (reference implementation)):
 
 | Field | Status | Purpose |
 |-------|--------|---------|
@@ -94,11 +94,11 @@ The marketplace UI filters use `OFFER_FILTER_TABS` to map top-level tabs (SERVIC
 
 ## References
 
-- [ADR-078](../../decisions/078-universal-category-catalog-consolidation.md) — Universal Category Catalog Consolidation (canonical; supersedes ADR-059)
-- [ADR-059](../../decisions/059-standardized-category-protocol.md) — Standardized Category Protocol (UNSPSC) — historical, superseded by ADR-078
+- ADR-078 (PDC) — Universal Category Catalog Consolidation (canonical; supersedes ADR-059)
+- ADR-059 (PDC) — Standardized Category Protocol (UNSPSC) — historical, superseded by ADR-078
 - [ADR-078] — StandardCategory as single source of truth (legacy `Category` removed)
-- [ADR-113](../../decisions/113-coop-offertype-milestone-applications.md) — Cooperation as 4th OfferType
-- [ADR-111](../../decisions/111-tender-offers-as-cooperationtype.md) — CooperationType discriminator
+- ADR-113 (PDC) — Cooperation as 4th OfferType
+- ADR-111 (PDC) — CooperationType discriminator
 - [core/nostr-events.md](nostr-events.md) — `category` and `fields` tag schemas
 - [workflows/cooperation-protocol.md](../workflows/cooperation-protocol.md) — COOP tier usage
 - Memory: `project_category_system`, `project_standardcategory_seeding`

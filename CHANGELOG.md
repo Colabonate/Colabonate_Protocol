@@ -7,7 +7,35 @@ Format: [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH`
 - MINOR: New protocol features, new event kinds, new specification documents
 - PATCH: Clarifications, corrections, editorial improvements
 
-**Versioning philosophy:** The protocol version starts at `v0.x.x`. Community development and open review lead to `v1.0.0` — the first stable, implementer-ready standard. See [SPECIFICATION_STATUS.md](SPECIFICATION_STATUS.md) and the [milestone roadmap](README.md#milestone-roadmap).
+**Versioning philosophy:** The protocol version starts at `v0.x.x`. Community development and open review lead to `v1.0.0` — the first stable, implementer-ready standard. See [SPECIFICATION_STATUS.md](SPECIFICATION_STATUS.md) for the path to `v1.0.0`.
+
+---
+
+## [0.5.1-draft] – 2026-09-25 — Repository hygiene, dead ADR links, byte-exact evidence
+
+Editorial/structural only — no schema, kind or state-machine change.
+
+### Fixed
+- **Dead links:** 28 links into the removed `docs/decisions/` folder (across README, `docs/protocols/README.md` and 12 spec documents) converted to the repo's PDC-marker convention (`ADR-NNN (PDC)` / `(PDC: see ADR-NNN)`). ADR numbers and titles are preserved.
+- **Other broken links:** links into reference-implementation files (`prisma/schema.prisma`, `docs/plans/NIP-B/NIP-C` drafts, `prd/` PRD) turned into plain path mentions labelled as reference-implementation; wrong `CHANGELOG.md` path in `protocol-spec-v1.md`; links to not-yet-existing planned documents in `SPECIFICATION_STATUS.md` unlinked; stale `README.md#milestone-roadmap` link removed.
+- **Broken anchors:** four heading anchors in `dao-codex.md` / `role-onboarding.md` corrected to GitHub's slug format (`—` → `--`).
+- **`dao-codex.md` verdict/escrow sentence:** no longer claims verdicts trigger Lightning escrow settlement; now describes enforcement per payment path (Path 2 `submit_dao_verdict`, Direct-Pay reputation-only, `[LEGACY]` `escrow_action`) and links `escrow-protocol.md §3` — consistent with `dispute-protocol.md` since v0.2.1.
+- All relative links and anchors in tracked Markdown now resolve, except the ISO 20022 papers (see below).
+- **GLOSSARY / CONTRIBUTING:** "Smart Contract" now maps to **Non-custodial Escrow** (Direct-Pay / ICP Escrow Canister) instead of the `[LEGACY]` Hold-Invoice "Lightning Escrow", consistent with `escrow-protocol.md` since v0.2.0.
+- **v0.5.0 release snapshot rebuilt:** the first `colabonate_protocol_v0.5.0-draft.zip` was built from a CRLF-converted Windows checkout and did not match the repository byte-for-byte. It was rebuilt from the committed v0.5.0 contents (all 37 files byte-identical to git) and re-stamped; `.sha256` and `.ots` replaced.
+
+### Added
+- **`.gitattributes`** — keeps `.ots`, `.zip`, `.pdf`, `.sha256` and the timestamped whitepapers byte-exact on every platform (a CRLF checkout previously made `ots verify` fail for the v8 whitepapers although the proofs are valid).
+- **`AGENTS.md`** — published and brought up to date (it was referenced by CONTRIBUTING.md but never tracked): current structure, PDC convention, versioning, OpenTimestamps release procedure, status tags, MIT license.
+- **CONTRIBUTING.md** — "Release Evidence (OpenTimestamps)" section; ADRs clarified as living in the reference-implementation repo.
+
+### Changed
+- **OpenTimestamps proofs upgraded:** `colabonate_protocol_v0.4.0-draft.zip.ots`, `colabonate_whitepaper_de_v8.md.ots`, `colabonate_whitepaper_en_v8.md.ots` now contain complete Bitcoin block-header attestations (blocks 962647–962709, 2026-08-16) — verifiable offline without the calendar servers.
+- **`.github/` templates** — removed `docs/decisions/` references; PR checklist asks for PDC markers and CHANGELOG/STATUS updates.
+- **`.gitignore`** — local AI-tooling folders, `CLAUDE.md` and `plans/` excluded.
+
+### Not changed (deliberately)
+- The ISO 20022 positioning papers (`Colabonate_ISO20022_Complementary_Layer_*.md`) cite ADR file paths as bibliographic sources of the reference-implementation repo. They are paired with published PDFs and left untouched; their Markdown versions also reference an `assets/escrow-state-diagram.svg` that is not part of this repository (known gap, to be addressed with the next paper revision).
 
 ---
 

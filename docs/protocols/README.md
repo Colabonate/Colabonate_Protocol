@@ -130,4 +130,4 @@ For all technical terms (Ticket, Escrow, Pubkey, HID, COL-Points, etc.) → [GLO
 
 ## Architecture Decisions
 
-For the reasoning behind key protocol choices → [docs/decisions/INDEX.md](../decisions/INDEX.md)
+For the reasoning behind key protocol choices → Architecture Decision Records in the reference-implementation repository, referenced inline as `(PDC: see ADR-NNN)` markers (see [CONTRIBUTING.md](../../CONTRIBUTING.md#protocol-decision-changes-pdc-markers))

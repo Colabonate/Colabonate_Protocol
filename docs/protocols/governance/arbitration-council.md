@@ -220,9 +220,9 @@ Drilling into a resolved dispute shows each individual verdict:
 - [Dispute Protocol](../workflows/dispute-protocol.md) — 3-level dispute system
 - [Nostr Events](../core/nostr-events.md) — Kind 30020, 30021, 30022, 30023 schemas
 - [Escrow Protocol](../core/escrow-protocol.md) — Verdict → settlement mapping
-- [ADR-125](../../decisions/125-arbitration-council-bootstrap.md) — M0+M1 bootstrap record
-- [ADR-126](../../decisions/126-arbitration-council-multi-member.md) — M2 multi-member implementation
-- [PRD: M2 Multi-Member Operation](../../prd/ARBITRATION-COUNCIL-M2-PRD.md) — Product specification
+- ADR-125 (PDC) — M0+M1 bootstrap record
+- ADR-126 (PDC) — M2 multi-member implementation
+- PRD: M2 Multi-Member Operation (`prd/ARBITRATION-COUNCIL-M2-PRD.md`, reference-implementation repo) — Product specification
 
 ---
 

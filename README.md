@@ -6,7 +6,7 @@
 
 [![Specification Status](https://img.shields.io/badge/spec-v0.4.0--draft-yellow)](SPECIFICATION_STATUS.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Bitcoin-only](https://img.shields.io/badge/Bitcoin-only-orange)](docs/decisions/007-protocol-documentation-bitcoin-only.md)
+[![Bitcoin-only](https://img.shields.io/badge/Bitcoin-only-orange)](docs/protocols/GLOSSARY.md#important-bitcoin-only)
 
 ---
 
@@ -42,7 +42,7 @@ This repository contains the **protocol specification** and supporting documenta
 | **Governance** | Nostr Votes + DAO Codex | [dao-codex.md](docs/protocols/governance/dao-codex.md) |
 | **Agent Marketplace** (optional) | Agent Setup offers + Kinds 31419/31423 | [agent-marketplace-protocol.md](docs/protocols/workflows/agent-marketplace-protocol.md) |
 
-**Bitcoin-only:** No EVM, no Ethereum, no altcoins. See [ADR 007](docs/decisions/007-protocol-documentation-bitcoin-only.md).
+**Bitcoin-only:** No EVM, no Ethereum, no altcoins. See [GLOSSARY — Bitcoin-native Equivalents for EVM Terms](docs/protocols/GLOSSARY.md#bitcoin-native-equivalents-for-evm-terms) (PDC: see ADR-007).
 
 ---
 

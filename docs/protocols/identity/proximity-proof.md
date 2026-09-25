@@ -60,7 +60,7 @@ None of these are V1 blockers, so the mechanism is specified at the level needed
 - [Nostr Events § Kind 30026](../core/nostr-events.md) — event schema (placeholder until this phase ships)
 - [Nostr Events § Kind 30021 — Credential Event](../core/nostr-events.md) — credential issuance
 - [DAO Codex](../governance/dao-codex.md) — sanction process for misbehaving verifiers
-- [ADR-010 — Identity Level Model](../../decisions/010-identity-level-model.md)
+- ADR-010 (PDC) — Identity Level Model
 
 ---
 

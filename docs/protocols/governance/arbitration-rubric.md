@@ -106,7 +106,7 @@ Amendment is not retroactive. In-flight disputes continue under the rubric versi
 - [Dispute Protocol](../workflows/dispute-protocol.md)
 - [Arbitration Council Spec](./arbitration-council.md)
 - [Nostr Events Reference](../core/nostr-events.md)
-- [ADR-125: Arbitration Council Bootstrap](../../decisions/125-arbitration-council-bootstrap.md)
+- ADR-125 (PDC): Arbitration Council Bootstrap
 
 ---
 

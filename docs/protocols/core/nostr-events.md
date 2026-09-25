@@ -19,7 +19,7 @@
 > - `30019` (Ticket Status) → Use `30408` instead
 >
 > **Resolution:** Dual-publishing to both legacy (30017–30027) and NIP-compliant (30402–30409) kinds.
-> See [ADR-101: NIP-15 Kind Conflict Resolution](../../decisions/101-nip-15-kind-conflict.md) for full details.
+> See ADR-101 (PDC): NIP-15 Kind Conflict Resolution for full details.
 
 ---
 
@@ -217,7 +217,7 @@ Offers have no explicit status field in the event. Status is determined by:
 **Status:** [IMPLEMENTED] as NIP-compliant Kind 30407 (legacy 30018 dual-published per ADR-101/106)
 **Layer:** Transaction
 **Purpose:** A buyer creates a ticket (contract) against an offer. Published by the buyer after ticket creation.
-**Draft:** [docs/plans/NIP-B-transaction-layer.md](../../plans/NIP-B-transaction-layer.md)
+**Draft:** `docs/plans/NIP-B-transaction-layer.md` (reference-implementation repo)
 
 ### Schema
 
@@ -269,7 +269,7 @@ Optional message from buyer to seller. Markdown supported. Max 2048 characters.
 **Status:** [IMPLEMENTED] as NIP-compliant Kind 30408 (legacy 30019 dual-published per ADR-101/106)
 **Layer:** Transaction
 **Purpose:** Either party updates the ticket status. Published by the party making the status change.
-**Draft:** [docs/plans/NIP-B-transaction-layer.md](../../plans/NIP-B-transaction-layer.md)
+**Draft:** `docs/plans/NIP-B-transaction-layer.md` (reference-implementation repo)
 
 ### Schema
 
@@ -988,7 +988,7 @@ Published by Lightspark Grid (acting as LNURL server) after the Lightning paymen
 **Status:** [IMPLEMENTED] NIP-C (ADR-108/109/119)
 **Layer:** Cooperation
 **Purpose:** Published by the initiator to propose a cooperation; partner accepts by publishing an acceptance event with the same `d` tag, forming a cryptographically signed agreement.
-**Draft:** [docs/plans/NIP-C-cooperation-layer.md](../../plans/NIP-C-cooperation-layer.md)
+**Draft:** `docs/plans/NIP-C-cooperation-layer.md` (reference-implementation repo)
 
 ### Schema
 
@@ -1053,7 +1053,7 @@ the complete cryptographically verifiable agreement.
 **Status:** [IMPLEMENTED] NIP-C (ADR-113/120)
 **Layer:** Cooperation
 **Purpose:** Published by the performer to report milestone completion; initiator accepts to release payment.
-**Draft:** [docs/plans/NIP-C-cooperation-layer.md](../../plans/NIP-C-cooperation-layer.md)
+**Draft:** `docs/plans/NIP-C-cooperation-layer.md` (reference-implementation repo)
 
 ### Schema
 
@@ -1127,7 +1127,7 @@ To comply with [NIP-99 (Classified Listings Standard)](https://github.com/nostr-
 | 30028 | 30414 | Cooperation Proposal | NIP-C cooperation |
 | 30029 | 30415 | Milestone Event | NIP-C cooperation |
 
-**Implementation:** Legacy and NIP-compliant kinds are published in parallel. Clients may subscribe to either range. Only `30017–30019` are in genuine conflict with NIP-15 (hard dual-publish); the remaining legacy/NIP-99 pairs are a convention for compatibility. Legacy kinds will be deprecated after a deprecation period (see [ADR-101](../../decisions/101-nip-15-kind-conflict.md) for timeline).
+**Implementation:** Legacy and NIP-compliant kinds are published in parallel. Clients may subscribe to either range. Only `30017–30019` are in genuine conflict with NIP-15 (hard dual-publish); the remaining legacy/NIP-99 pairs are a convention for compatibility. Legacy kinds will be deprecated after a deprecation period (PDC: see ADR-101 for timeline).
 
 **Schemas:** NIP-99 kinds 30402, 30407, 30408 use identical schemas to their legacy counterparts (30017, 30018, 30019 above). No schema duplication needed here — implementers should reference the legacy kind documentation and treat the NIP-99 kinds as direct replacements.
 

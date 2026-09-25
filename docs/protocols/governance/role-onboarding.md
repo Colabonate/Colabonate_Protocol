@@ -23,7 +23,7 @@ You are a member of the Colabonate Arbitration Council, the operative arm of the
 Read the following in order before submitting your first verdict:
 
 1. **[Arbitration Rubric v1.0.0](./arbitration-rubric.md)** — Read §1–§4 completely. You need to know the Decision Matrix and when deviation is appropriate.
-2. **[DAO Codex Appendix A](./dao-codex.md#appendix-a-foundation-dao-operation-adr-125-adr-126)** — Understand the bootstrap context; you operate under M2 rules (SINGLE quorum until M3).
+2. **[DAO Codex Appendix A](./dao-codex.md#appendix-a--foundation-dao-operation-adr-125--adr-126)** — Understand the bootstrap context; you operate under M2 rules (SINGLE quorum until M3).
 3. **[Dispute Protocol](../workflows/dispute-protocol.md)** — Understand the 3-level system and when a dispute is eligible for Council review.
 4. **[Arbitration Council Spec](./arbitration-council.md)** — Technical operational details: credential types, event kinds, quorum evaluation.
 
@@ -240,7 +240,7 @@ Once the arbitrator issues a verdict and quorum is met, the verdict is **final a
 - [Arbitration Rubric](./arbitration-rubric.md)
 - [Dispute Protocol](../workflows/dispute-protocol.md)
 - [Arbitration Council Spec](./arbitration-council.md)
-- [ADR-125: Bootstrap](../../decisions/125-arbitration-council-bootstrap.md)
+- ADR-125 (PDC): Bootstrap
 
 ---
 

@@ -141,7 +141,7 @@ The following table shows EVM-ecosystem terms and their Colabonate Bitcoin-nativ
 
 | EVM term | Colabonate equivalent | Notes |
 |----------|-----------------------|-------|
-| Smart Contract | Lightning Escrow | Hold Invoices + Nostr event rules |
+| Smart Contract | Non-custodial Escrow | Direct-Pay (Path 1) or ICP Escrow Canister (Path 2) + Nostr event rules — see [escrow-protocol.md](core/escrow-protocol.md). Hold-Invoice "Lightning Escrow" is [LEGACY] (PDC: see ADR-253) |
 | NFT / Soulbound NFT | Nostr Event + pubkey signature | Kind 30021 credential |
 | DAO Token Vote | Nostr-based Governance Vote | Kind 30022 event |
 | On-chain storage | Nostr Relay | Events, not blockchain storage |

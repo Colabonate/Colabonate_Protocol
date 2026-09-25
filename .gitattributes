@@ -1,0 +1,7 @@
+# Timestamped evidence files must stay byte-identical on every platform,
+# otherwise `ots verify` fails after a CRLF checkout (e.g. Windows autocrlf).
+*.ots                        binary
+*.zip                        binary
+*.pdf                        binary
+*.sha256                     -text
+colabonate_whitepaper_*.md   -text

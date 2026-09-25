@@ -48,7 +48,7 @@ Three voting models are available. The DAO selects the applicable model per prop
 - RRC-20 governance token on RSK (Bitcoin sidechain — not Ethereum)
 - Staking enables token-weighted governance participation and 5% APY yield
 - Full specification: [economic-protocol.md](./economic-protocol.md)
-- Stake event schema: Nostr Kind 30025 — see [nostr-events.md](../core/nostr-events.md#kind-30025-cola-token-stake-event)
+- Stake event schema: Nostr Kind 30025 — see [nostr-events.md](../core/nostr-events.md#kind-30025--cola-token-stake-event)
 
 ### I.2 Proposal Types and Voting Model Selection
 
@@ -78,7 +78,7 @@ Quorum is measured as a percentage of active pubkeys (at least 1 COMPLETED ticke
 5. Result published as a final Kind 30022 event (immutable, signed by DAO operator pubkey)
 ```
 
-Vote event schema: see [nostr-events.md](../core/nostr-events.md#kind-30022-governance-vote)
+Vote event schema: see [nostr-events.md](../core/nostr-events.md#kind-30022--governance-vote)
 
 ### I.4 Delegation (Liquid Democracy) [PHASE 4+]
 
@@ -112,7 +112,7 @@ Vote event schema: see [nostr-events.md](../core/nostr-events.md#kind-30022-gove
 
 Full specification: [dispute-protocol.md](../workflows/dispute-protocol.md)
 
-Escrow impact: DAO Court verdicts are published as Kind 30019 events with `escrow_action` tag, triggering Lightning escrow settlement. See [escrow-protocol.md](../core/escrow-protocol.md#dispute-verdict-to-escrow-mapping).
+Escrow impact depends on the payment path: on Path 2 (ICP Escrow Canister) the verdict is enforced via the canister's BIP-340-signed `submit_dao_verdict`; on Path 1 (Direct-Pay) it is reputation-only; the `[LEGACY]` Hold-Invoice path used a Kind 30019 event with `escrow_action` tag. See [escrow-protocol.md §3](../core/escrow-protocol.md#3-escrow-in-dispute-path-2) and [dispute-protocol.md](../workflows/dispute-protocol.md).
 
 ### II.2 Sanctions
 
@@ -216,7 +216,7 @@ Community members can publish their own workflow protocols:
 - Successful protocols become standard templates in the Protocol Registry
 - Protocol authors can attach Royalty Tickets (sat-denominated, per-use fee)
 - Open-source and premium models both supported
-- Registry specification: [governance-roadmap.md](./governance-roadmap.md#phase-5-workflow-editor-and-protocol-marketplace)
+- Registry specification: [governance-roadmap.md](./governance-roadmap.md#phase-5--workflow-editor-and-protocol-marketplace)
 
 ---
 
@@ -316,7 +316,7 @@ The hash is computed over the UTF-8 bytes of `arbitration-rubric.md`. Changes to
 - [docs/protocols/governance/governance-roadmap.md](./governance-roadmap.md) — Phase-by-phase roadmap
 - [docs/protocols/workflows/dispute-protocol.md](../workflows/dispute-protocol.md) — Dispute resolution
 - [docs/protocols/core/nostr-events.md](../core/nostr-events.md) — Event schemas (Kind 30022, 30025)
-- [ADR 012: COL-Points vs COLA Token](../../decisions/012-col-points-vs-cola-token.md)
+- ADR-012 (PDC): COL-Points vs COLA Token
 
 ---
 

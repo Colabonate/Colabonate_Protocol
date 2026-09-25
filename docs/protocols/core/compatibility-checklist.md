@@ -97,13 +97,13 @@ A compatible client must **observe and respect** this state machine:
 
 A compatible client must:
 
-1. **Understand Hold Invoices** ([ADR-121](../../decisions/121-lightning-payment-gate-escrow.md)):
+1. **Understand Hold Invoices** (PDC: see ADR-121):
    - Buyer pays a Lightning Hold Invoice (HTLC-locked funds)
    - Funds are held (not released) until seller completes delivery
    - Invoice expiry auto-cancels the ticket (funds return to buyer)
    - Only when buyer confirms delivery can seller claim funds
 
-2. **Respect Lightning-level timeouts** ([ADR-131](../../decisions/131-timeout-policy-app-vs-lightning.md)):
+2. **Respect Lightning-level timeouts** (PDC: see ADR-131):
    - The authoritative timeout is the Hold Invoice expiry (on the Lightning Network)
    - App-level timeouts (e.g., "Pay by [date]") are informative only
    - When an invoice expires, the ticket auto-transitions to CANCELLED
@@ -250,8 +250,8 @@ Use this checklist to verify compatibility:
 - **[ticket-system.md](./ticket-system.md)** – State machine details
 - **[dispute-protocol.md](../workflows/dispute-protocol.md)** – Dispute escalation
 - **[escrow-protocol.md](./escrow-protocol.md)** – Lightning Hold Invoice mechanics
-- **[ADR-121](../../decisions/121-lightning-payment-gate-escrow.md)** – Escrow design
-- **[ADR-131](../../decisions/131-timeout-policy-app-vs-lightning.md)** – Timeout authority
+- **ADR-121** (PDC) – Escrow design
+- **ADR-131** (PDC) – Timeout authority
 - **[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md)** – Nostr protocol
 - **[NIP-99](https://github.com/nostr-protocol/nips/blob/master/99.md)** – Classified Listings
 

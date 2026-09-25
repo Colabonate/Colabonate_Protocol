@@ -15,8 +15,9 @@ Briefly describe the bug.
 Which documents are affected?
 - [ ] docs/protocols/core/
 - [ ] docs/protocols/workflows/
+- [ ] docs/protocols/identity/
 - [ ] docs/protocols/governance/
-- [ ] docs/decisions/
+- [ ] docs/protocols/bpmn/
 
 ## Expected Behavior
 

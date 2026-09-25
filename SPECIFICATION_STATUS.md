@@ -2,7 +2,7 @@
 
 This document tracks the status of every protocol specification. It is the authoritative source for knowing what is stable, what is in draft, and what is planned.
 
-**Current protocol version:** `v0.5.0-draft`
+**Current protocol version:** `v0.5.1-draft`
 **Target for `v1.0.0`:** All documents at `Stable` or `Accepted`, all open questions resolved.
 
 > **v0.2.0 "Truth-Reset":** This release re-aligns the specification with the reference implementation (the Colabonate App, the master). The escrow/payment architecture is rewritten to the **non-custodial** model (Direct-Pay + ICP Canister; custodial Hold-Invoices are now Legacy/flag-only). The Nostr DAO kind mapping (30022/30420–30423) is reconciled to the code.
@@ -44,8 +44,8 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 | [legal-binding-layer.md](docs/protocols/core/legal-binding-layer.md) | Draft | None |
 | [payment-architecture.md](docs/protocols/core/payment-architecture.md) | Draft | Non-custodial rails (ADR-253); Lightspark/RSK/Spark demoted to observe |
 | [openness-model.md](docs/protocols/core/openness-model.md) | Draft | NEW — three-layer architecture (Protocol/Coordination/Client), what implementers must vs need not build |
-| [security-model.md](docs/protocols/core/security-model.md) | Planned | — |
-| [protocol-versioning.md](docs/protocols/core/protocol-versioning.md) | Planned | — |
+| security-model.md | Planned | — |
+| protocol-versioning.md | Planned | — |
 
 ---
 
@@ -85,4 +85,4 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 
 
 
-*Last updated: 2026-09-25 | Colabonate Protocol v0.5.0-draft*
+*Last updated: 2026-09-25 | Colabonate Protocol v0.5.1-draft*
