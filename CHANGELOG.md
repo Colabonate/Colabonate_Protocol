@@ -11,6 +11,29 @@ Format: [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH`
 
 ---
 
+## [0.5.0-draft] – 2026-09-25 — Agent Marketplace (optional extension, ADR-398 catch-up)
+
+> Refers to decision record **ADR-398 (Agent Marketplace Protocol Catch-Up)** in the Colabonate reference-implementation repository. The agent layer is an optional protocol extension; the mandatory compatibility set is unchanged.
+
+### Added
+- `docs/protocols/core/nostr-events.md`: **Agent Marketplace Kinds (31416–31424)** section + `offer_type` tag on Kind 30017/30402. Normative schemas: **31419** (Agent Review Attestation), **31423** (Verified-Agent-Badge). Reserved: 31416–31418, 31420–31424. Not allocated: 31430–31444.
+- `docs/protocols/workflows/agent-marketplace-protocol.md`: Agent Setup workflow (offer → booking → workspace → HITL → review/dispute).
+- `docs/protocols/core/ticket-system.md`: `OfferType.AGENT_SETUP` and the agent ticket fields + HITL gate.
+- `docs/protocols/core/reputation-protocol.md`: agent reputation (Kind 31419, trust score, verified badge).
+- `docs/protocols/core/roles.md`, `docs/protocols/identity/identity-protocol.md`: agent participants / agent identities.
+- `docs/protocols/core/payment-architecture.md`, `docs/protocols/governance/economic-protocol.md`: "Reference Platform Services" (Descriptive).
+- `docs/protocols/GLOSSARY.md`: Agent Marketplace terms.
+
+### Notes
+- Kind numbers are **reserved, not published** except 31419/31423. Do not publish to 31416–31418/31420–31424.
+- Agent events are signed by the owner pubkey; no agent sub-key exists.
+- No collision with existing ranges (30017–30029, 30402–30409, 30414–30415, 30420–30423, 31922–31925).
+
+### Release artifacts
+- `colabonate_protocol_v0.5.0-draft.zip` — snapshot of `docs/protocols/`, with `.sha256` checksum and `.ots` OpenTimestamps proof (prior-art evidence, same procedure as v0.4.0).
+
+---
+
 ## [0.4.0-draft] – 2026-08-16 — Bookable Resources / NIP-52 (ADR-270/271/272 catch-up)
 
 The app repo's `ADR-270` (Product Attributes and Variants) and `ADR-271` (Bookable Resources and Time-Based Offers via NIP-52) both shipped real, tested code — but neither had ever been documented in `docs/protocols/`, in *either* repo. This release ports the app repo's own catch-up work (its `ADR-276`) into this repo, so there was no drift to close on the app-repo side first this time — both repos now describe the same content, adapted for this repo's PDC-marker/no-internal-links convention as usual.

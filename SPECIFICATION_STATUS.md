@@ -2,7 +2,7 @@
 
 This document tracks the status of every protocol specification. It is the authoritative source for knowing what is stable, what is in draft, and what is planned.
 
-**Current protocol version:** `v0.4.0-draft`
+**Current protocol version:** `v0.5.0-draft`
 **Target for `v1.0.0`:** All documents at `Stable` or `Accepted`, all open questions resolved.
 
 > **v0.2.0 "Truth-Reset":** This release re-aligns the specification with the reference implementation (the Colabonate App, the master). The escrow/payment architecture is rewritten to the **non-custodial** model (Direct-Pay + ICP Canister; custodial Hold-Invoices are now Legacy/flag-only). The Nostr DAO kind mapping (30022/30420–30423) is reconciled to the code.
@@ -10,6 +10,8 @@ This document tracks the status of every protocol specification. It is the autho
 > **v0.3.0:** Two new documents ported from the app repo (`core/openness-model.md`, `governance/dao-technology-stack.md`), refreshed to the non-custodial model before porting.
 >
 > **v0.4.0:** New `workflows/booking-protocol.md` and a new "Booking Events (NIP-52)" section in `nostr-events.md` (kinds 31922–31925) — bookable resources / time-based offers, ported from the app repo where they were built but never previously documented in either repo. `ticket-system.md` gains `variantLabel`. Deposits/cancellation policy are explicitly documented as **proposed, not implemented**. See [CHANGELOG.md](CHANGELOG.md) for the full v0.2.2/v0.3.0/v0.4.0 entries.
+>
+> **v0.5.0:** Optional **Agent Marketplace** extension — new `workflows/agent-marketplace-protocol.md`, Agent Marketplace kind block `31416`–`31424` in `nostr-events.md` (31419/31423 implemented, rest reserved), `offer_type` tag, `OfferType.AGENT_SETUP` + agent ticket fields in `ticket-system.md`. Not part of the mandatory compatibility set (PDC: see ADR-398).
 
 ---
 
@@ -65,6 +67,7 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 | [cooperation-protocol.md](docs/protocols/workflows/cooperation-protocol.md) | Draft | Phase 2 design |
 | [booking-protocol.md](docs/protocols/workflows/booking-protocol.md) | Draft | NEW — implemented in code (ADR-271); payment/cancellation (ADR-272) proposed, not built |
 | [dispute-protocol.md](docs/protocols/workflows/dispute-protocol.md) | Draft | Phase 4 design |
+| [agent-marketplace-protocol.md](docs/protocols/workflows/agent-marketplace-protocol.md) | Draft (optional extension) | NEW — Kinds 31419/31423 published; 31416–31424 reserved (ADR-398) |
 
 ---
 
@@ -82,4 +85,4 @@ No specification has reached `Stable` yet. This is the work of `v0.1.1` → `v1.
 
 
 
-*Last updated: 2026-08-16 | Colabonate Protocol v0.4.0-draft*
+*Last updated: 2026-09-25 | Colabonate Protocol v0.5.0-draft*

@@ -153,6 +153,8 @@ The Foundation explicitly does NOT collect fees on base protocol usage (buy/sell
 
 ---
 
+> **(PDC: see ADR-398) Reference Platform Services (Descriptive).** The fees above are protocol-level economics. Separately, the Colabonate reference platform charges for services it operates — agent workspace compute (ICP cost-plus, platform-direct funding; ADR-347/351), the hosted doop canvas (flat 2,600 sats; ADR-372/387) and a 2,600-sat minimum platform charge. These are **Descriptive**, not core-protocol fees; ADR-245's fee-free core commerce and the no-commission rule on agent bookings (ADR-315 D1) are unchanged. See [payment-architecture.md](../core/payment-architecture.md#reference-platform-services-descriptive--pdc-adr-398).
+
 ## Economic Attack Resistance
 
 | Attack | Mitigation |

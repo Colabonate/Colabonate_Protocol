@@ -91,8 +91,9 @@ model Ticket {
 }
 
 enum OfferType {
-  SERVICE   // 1x per buyer, seller must accept
-  PRODUCT   // unlimited quantity, auto-accepted
+  SERVICE     // 1x per buyer, seller must accept
+  PRODUCT     // unlimited quantity, auto-accepted
+  AGENT_SETUP // ADR-305: bookable AI agent; behaves like SERVICE, billed via agentBillingModel
 }
 
 enum TicketType {
@@ -119,12 +120,29 @@ enum TicketType {
 >
 > **Bookable resources (PDC: see ADR-271):** a ticket for a bookable offer carries no booking-specific fields of its own — booking state lives on separate `BookableResource`/`Booking` entities and the seller's countersigned NIP-52 event, not on `Ticket`. See [workflows/booking-protocol.md](../workflows/booking-protocol.md) for the full booking workflow, including the explicit note that deposits/cancellation policy (PDC: see ADR-272) are **designed but not implemented** — no `DEPOSIT_PAID` status or cancellation-tier field exists in the current schema.
 
+### Agent Setup tickets (PDC: ADR-398)
+
+An `AGENT_SETUP` offer (Kind 30017/30402 with `offer_type=agent_setup`) creates a normal `SMART_ORDER` ticket, extended with these agent-specific fields. The agent layer is an **optional protocol extension**: a compatible implementation that does not support it may treat `AGENT_SETUP` offers as unsupported.
+
+| Field | Meaning | Normativity |
+|-------|---------|-------------|
+| `agentBillingModel` | Snapshot of the offer's billing model at ticket creation: `ONE_TIME` \| `PER_HOUR` \| `PER_TOKEN` \| `SUBSCRIPTION`. Snapshotting prevents a later offer edit from retroactively changing an open ticket's billing (ADR-312 D6). `ONE_TIME` bills like a service; metered models are billed against the ICP workspace — `PER_HOUR` and `SUBSCRIPTION` are **not implemented** yet. | Normative (snapshot semantics) |
+| `qualityGateRequired` + `qualityApprovedAt` | Human-in-the-loop gate. When set, the *seller's* own `→ COMPLETED` transition is the review and stamps `qualityApprovedAt` (ADR-308 D2). | Normative (transition rule) |
+| `agentConfigHash` + `agentConfigSealedSnapshot` | The sealed agent configuration is pinned at booking so the agent that executes is the one the buyer saw; config injection refuses a mismatching hash (ADR-396 D3). | Reference-server behavior |
+| `agentTaskId` | Optional link to an `AgentTask` (Bounty). **In flight** (ADR-397 D4, FU-864) — reserved, not yet a stable ticket lifecycle guarantee. | Reserved |
+| `agentDisputeType` | Optional agent-specific dispute classification that feeds the accountability/trust recomputation (ADR-318 D5). | Reference (dispute metadata) |
+
+**Transition rule (normative):** for a ticket with `qualityGateRequired = true`, a buyer's `→ COMPLETED` transition is only valid after the seller's approval has set `qualityApprovedAt`. The reference server rejects the premature transition with HTTP 409 / `QUALITY_REVIEW_PENDING`; the exact code is reference-server behavior, the state requirement is protocol.
+
+**Workspace binding (reference):** an accepted `AGENT_SETUP` ticket may be bound to an ICP workspace canister that executes the agent and meters compute (`Workspace`, ADR-311). Workspace internals are reference implementation, not required for compatibility — see [../workflows/agent-marketplace-protocol.md](../workflows/agent-marketplace-protocol.md).
+
 **OfferType Behavior:**
 
 | OfferType | Status after creation | Seller approval required | UI Action |
 |-----------|----------------------|-------------------------|-----------|
 | SERVICE   | PENDING              | Yes                     | "Request" |
 | PRODUCT   | IN_PROGRESS          | No (auto-accepted)      | "Buy Now" |
+| AGENT_SETUP | PENDING            | Yes                     | "Request" |
 
 **Status Flow (Phase 2):**
 

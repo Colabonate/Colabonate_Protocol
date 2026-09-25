@@ -40,6 +40,7 @@ This repository contains the **protocol specification** and supporting documenta
 | **Bookable Resources** | NIP-52 Calendar Events (Kinds 31922–31925) | [booking-protocol.md](docs/protocols/workflows/booking-protocol.md) |
 | **Reputation** | COL-Points + Nostr Reviews | [reputation-protocol.md](docs/protocols/core/reputation-protocol.md) |
 | **Governance** | Nostr Votes + DAO Codex | [dao-codex.md](docs/protocols/governance/dao-codex.md) |
+| **Agent Marketplace** (optional) | Agent Setup offers + Kinds 31419/31423 | [agent-marketplace-protocol.md](docs/protocols/workflows/agent-marketplace-protocol.md) |
 
 **Bitcoin-only:** No EVM, no Ethereum, no altcoins. See [ADR 007](docs/decisions/007-protocol-documentation-bitcoin-only.md).
 
@@ -88,6 +89,7 @@ Full status table: [SPECIFICATION_STATUS.md](SPECIFICATION_STATUS.md)
 | Identity | identity-protocol | Draft |
 | Payments | payment-architecture | Draft |
 | Workflows | buy-protocol, sell-protocol | Draft (Phase 1 core flow) |
+| Agent Marketplace (optional) | agent-marketplace-protocol, nostr-events (agent kinds) | Draft (agent layer optional) |
 | Governance | dao-codex, economic-protocol, dao-creation-protocol | Draft |
 
 No document has yet reached `Stable` status. This is the goal of our current open development phase.

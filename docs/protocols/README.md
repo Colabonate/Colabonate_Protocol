@@ -28,6 +28,7 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | [workflows/sell-protocol.md](workflows/sell-protocol.md) | How to sell: offer creation → fulfillment |
 | [workflows/cooperation-protocol.md](workflows/cooperation-protocol.md) | Multi-party project collaboration |
 | [workflows/booking-protocol.md](workflows/booking-protocol.md) | Bookable resources: time-based offers, NIP-52 calendars |
+| [workflows/agent-marketplace-protocol.md](workflows/agent-marketplace-protocol.md) | Optional extension: bookable AI agents (Agent Setup offers) |
 | [workflows/dispute-protocol.md](workflows/dispute-protocol.md) | What happens when something goes wrong |
 
 ### For Governance and DAO Participants
@@ -65,7 +66,7 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | [protocol-spec-v1.md](core/protocol-spec-v1.md) | Draft | Technical spec v1 |
 | [roles.md](core/roles.md) | Draft | Participant roles |
 | [ticket-system.md](core/ticket-system.md) | Draft | Ticket types and state machine |
-| [nostr-events.md](core/nostr-events.md) | Draft | Nostr event schemas (30017–30029, 30402–30423, 31922–31925) |
+| [nostr-events.md](core/nostr-events.md) | Draft | Nostr event schemas (30017–30029, 30402–30423, 31416–31424, 31922–31925) |
 | [escrow-protocol.md](core/escrow-protocol.md) | Draft | Non-custodial payment & escrow (Direct-Pay + ICP) |
 | [escrow-canister-protocol.md](core/escrow-canister-protocol.md) | Draft | ICP native-Bitcoin escrow canister (Path 2) |
 | [payment-architecture.md](core/payment-architecture.md) | Draft | Bitcoin-native, non-custodial payment rails |
@@ -90,6 +91,7 @@ This directory contains the complete protocol specification for Colabonate. Docu
 | [sell-protocol.md](workflows/sell-protocol.md) | Phase 1 | Seller flow |
 | [cooperation-protocol.md](workflows/cooperation-protocol.md) | Phase 2 | Multi-party cooperation |
 | [booking-protocol.md](workflows/booking-protocol.md) | Draft (implemented in code) | Bookable resources, time-based offers (NIP-52) |
+| [agent-marketplace-protocol.md](workflows/agent-marketplace-protocol.md) | Draft (optional extension) | Agent Setup workflow: offer → booking → workspace → HITL → review/dispute |
 | [dispute-protocol.md](workflows/dispute-protocol.md) | Phase 4 | Conflict resolution |
 
 ### governance/

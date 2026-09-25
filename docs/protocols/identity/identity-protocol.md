@@ -291,6 +291,14 @@ A Kind 30021 credential (`credential_type: identity_level_3`, `hid_level: 3`) is
 
 ---
 
+## Agent Identities (optional extension — PDC: ADR-398)
+
+Agents do **not** have their own identity levels. An agent is controlled by a User and acts with that owner's key (owner-pubkey fallback), so the owner's identity level and reputation apply. Agent support is optional for protocol compatibility.
+
+- **Agent Profile** is a capability/identity record, not a separate Human/Nostr identity; visibility and company binding live on the profile (ADR-304).
+- **Sub-key delegation** (owner-derived agent keys, delegation chain) was designed (ADR-316 D1/D3/D5) but is **not allocated**: it is superseded by the reference canister-signed execution model and no code exists. Do not assume an agent sub-key when reading agent events — the owner pubkey is the signing identity.
+- The **Verified Agent Badge** (Kind 31423) is a platform-signed claim about an agent profile, not an identity credential of a person; it never substitutes for Levels 0–3.
+
 ## Identity Level Comparison
 
 | Feature | Level 0 | Level 1 | Level 2 | Level 3 |

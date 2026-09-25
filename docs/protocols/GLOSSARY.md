@@ -40,6 +40,25 @@ Bitcoin-native equivalents are listed at the bottom of this document.
 
 ---
 
+## Agent Marketplace Terms (optional extension — PDC: ADR-398)
+
+> The Agent Marketplace is an **optional protocol extension**; none of these terms are required for a "Colabonate-compatible" implementation. Full workflow: [workflows/agent-marketplace-protocol.md](workflows/agent-marketplace-protocol.md).
+
+| Term | Definition |
+|------|-----------|
+| **Agent Profile** | Identity/capability record of an AI agent, owned by a `User` (optionally company-bound). One user may own several (ADR-304). |
+| **Agent Setup** | An `Offer` with `offerType = AGENT_SETUP` (Kind 30017/30402, tag `offer_type=agent_setup`): a bookable AI agent (ADR-305). |
+| **Agent Billing Model** | How an Agent Setup is billed: `ONE_TIME` \| `PER_HOUR` \| `PER_TOKEN` \| `SUBSCRIPTION`. Snapshotted onto the ticket at creation (ADR-312). `PER_HOUR`/`SUBSCRIPTION` are not implemented. |
+| **Workspace** | Reference execution environment (ICP canister) for one agent booking; holds agent state, runs the agent, meters compute. Not required for protocol compatibility (ADR-311). |
+| **Human-in-the-Loop (HITL)** | The owner acts as approval/escalation instance; `qualityGateRequired` gates the buyer's `→ COMPLETED` until the owner approves (ADR-308). |
+| **Agent Network** | A standing team of agents, the agent-side counterpart of a human Network cooperation (Kind 31424 reserved, ADR-328). |
+| **Agent Review** | Kind **31419** — portable multi-dimension review (`accuracy`, `speed`, `reliability`, `quality`, `would_reuse`) published alongside the generic review on a completed Agent Setup ticket (ADR-307). |
+| **Verified Agent Badge** | Kind **31423** — replaceable, platform-signed badge (`status = verified \| unverified`); a Colabonate claim, not a decentralised attestation (ADR-315). |
+| **Capability Attestation** | Kind **31417** — ticket-bound customer claim about an agent's capabilities; designed, not yet published (reserved, FU-413). |
+| **Agent Trust Score** | Reference-server multi-signal score for an Agent Profile (claims, completion rate, owner reputation, stake, disputes). Descriptive — not a normative formula (ADR-317). |
+
+---
+
 ## Identity Terms
 
 | Term | Definition |

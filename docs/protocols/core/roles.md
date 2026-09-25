@@ -98,6 +98,19 @@ Anyone not holding an active role in a transaction.
 
 **No** action rights on tickets or payments.
 
+## Agent Participants (optional extension — PDC: ADR-398)
+
+Beyond human Initiators and Partners, the Agent Marketplace introduces **agents** as economic actors. Agent support is optional for protocol compatibility.
+
+- An agent is **not a User**: it has no wallet, e-mail or login and holds no identity level of its own. It acts through its **owner's** keys; until a dedicated delegation chain exists, owner-pubkey fallback is used (ADR-316 — the delegation chain itself is not allocated).
+- **Agent Profile** — the agent's identity/capability record, owned by a User, optionally company-bound (ADR-304).
+- **Agent Setup** — an `Offer` with `offerType = AGENT_SETUP`; the agent is the seller of that offer (ADR-305).
+- **Human-in-the-loop** — the owner can be required to approve before a booking completes (`qualityGateRequired`, ADR-308).
+- **Agent Network** — a standing team of agents, the agent-side counterpart of a human Network cooperation (Kind 31424 reserved, ADR-328).
+- The role a pubkey holds on an agent ticket is still determined by ticket context (owner/buyer); the agent itself never signs.
+
+Full workflow: [workflows/agent-marketplace-protocol.md](../workflows/agent-marketplace-protocol.md).
+
 ## Role Switching
 
 A single user (pubkey) can hold different roles across different tickets:

@@ -116,6 +116,20 @@ Standard Nostr zaps (Kinds 9734/9735) for tipping/micro-rewards. Referenced for 
 
 ---
 
+## Reference Platform Services (Descriptive — PDC: ADR-398)
+
+> **Descriptive / reference only.** These are charges the Colabonate **reference platform** levies for services it operates. They are **not** part of the core protocol and do **not** change ADR-245's fee-free core commerce. A compatible third-party implementation is not required to offer or mirror them.
+
+| Service | Charge | Charging model | Source |
+|---------|--------|----------------|--------|
+| Agent workspace compute | ICP cost-plus service fee on metered workspaces | Platform-direct funding; period costs plus documented margin | ADR-347, ADR-351 |
+| Hosted doop canvas | Flat 2,600 sats per doop-hosted ticket (non-refundable, earned at purchase) | Separate platform invoice alongside the seller's invoice; `doop-local` and agent-in-canvas are free | ADR-372 (revised 2026-09-07), ADR-387 |
+| Minimum platform payment | 2,600-sats floor on any platform charge | Validation floor | ADR-387 |
+
+Agent booking billing models (`agentBillingModel` on the ticket): `ONE_TIME` (seller price only), `PER_TOKEN` (metered against the workspace), `PER_HOUR` / `SUBSCRIPTION` (designed, not implemented). The ticket snapshot semantics are normative ([ticket-system.md](./ticket-system.md#agent-setup-tickets-pdc-adr-398)); the charging infrastructure is reference. No commission is taken on agent bookings (ADR-315 D1 / ADR-245).
+
+---
+
 ## Asset Summary
 
 | Asset | Network | Role | Status |

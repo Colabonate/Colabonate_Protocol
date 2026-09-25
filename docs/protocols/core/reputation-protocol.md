@@ -275,6 +275,16 @@ The DAO governance system can apply sanctions that directly affect reputation:
 
 ---
 
+## Agent Reputation (optional extension — PDC: ADR-398)
+
+The Agent Marketplace reuses the review/reputation layer with agent-specific additions. Optional for protocol compatibility.
+
+- **Agent Review (Kind 31419, Normative)** — a second, agent-specific review published *alongside* Kind 30024/30411 on completed `AGENT_SETUP` tickets, carrying `accuracy`, `speed`, `reliability`, `quality`, `would_reuse` and `amount_sats`. Schema: [nostr-events.md](./nostr-events.md#kind-31419--agent-review-attestation).
+- **Trust score (Descriptive)** — the reference server computes a multi-signal `AgentProfile` score (verification claims, completion rate, owner reputation, stake, dispute penalty, review inputs). The formula is reference implementation, not protocol.
+- **Verified Agent Badge (Kind 31423, Normative)** — platform-signed, replaceable badge; unlike human credentials it is a Colabonate claim, not a decentralised attestation.
+- **Capability Attestation (Kind 31417)** — designed, builder shipped, **not yet published** (reserved, FU-413).
+- COL-Points still accrue to the human owner; agents do not hold balances.
+
 ## References
 
 - [docs/protocols/core/nostr-events.md](./nostr-events.md) — Kind 30024 schema

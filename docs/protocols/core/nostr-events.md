@@ -1,13 +1,14 @@
 # Colabonate Nostr Event Kinds
 
 **Normativity:** Normative
-**Version:** 1.2.0-draft
-**Date:** 2026-08-16
-**Status:** [IMPLEMENTED] Kind 30017, 30018/30407, 30019/30408, 30020, 30021, 30022, 30024, 30027 (marketplace/governance/reputation) | [IMPLEMENTED] Kind 30414, 30415 (NIP-C cooperation) | [IMPLEMENTED] Kind 30420–30423 (DAO governance) | [IMPLEMENTED] Kind 31922–31925 (NIP-52 bookable resources) | [PHASE 3] Kind 30023, 30026 (identity attestation/proximity) | [PHASE 4] Kind 30025 (COLA staking)
+**Version:** 1.3.0-draft
+**Date:** 2026-09-25
+**Status:** [IMPLEMENTED] Kind 30017, 30018/30407, 30019/30408, 30020, 30021, 30022, 30024, 30027 (marketplace/governance/reputation) | [IMPLEMENTED] Kind 30414, 30415 (NIP-C cooperation) | [IMPLEMENTED] Kind 30420–30423 (DAO governance) | [IMPLEMENTED] Kind 31922–31925 (NIP-52 bookable resources) | [IMPLEMENTED, OPTIONAL EXTENSION] Kind 31419, 31423 (Agent Marketplace); 31416–31424 block otherwise reserved | [PHASE 3] Kind 30023, 30026 (identity attestation/proximity) | [PHASE 4] Kind 30025 (COLA staking)
 
 > (PDC: see ADR-101) — NIP-15 conflict dual-publishing.
 > (PDC: see ADR-105/111/112/128) — DAO governance kinds.
-> (PDC: see ADR-271) — NIP-52 bookable resources (kinds 31922–31925), new in this release.
+> (PDC: see ADR-271) — NIP-52 bookable resources (kinds 31922–31925).
+> (PDC: see ADR-398) — Agent Marketplace kinds (31416–31424, optional extension), new in this release.
 
 ---
 
@@ -52,6 +53,7 @@ Colabonate uses **addressable events** (kinds 30000–39999 per NIP-01) because:
 - `30402`, `30404`–`30409` — NIP-99-compliant duals (see dual-publishing table)
 - `30414`–`30415` — NIP-C cooperation layer
 - `30420`–`30423` — DAO governance (proposal/vote/membership/comment)
+- `31416`–`31424` — Agent Marketplace block, optional protocol extension (ADR-398; see [Agent Marketplace Kinds](#agent-marketplace-kinds-3141631424))
 
 ---
 
@@ -71,6 +73,11 @@ Kind 30024  — Reputation layer     (COL-Points score, reviews)
 Kind 30025  — Economic layer       (COLA token stake events)
 Kind 30026  — Identity layer       (Proximity proof)
 Kind 30027  — Marketplace layer    (Company Profile)
+
+Agent Marketplace (optional extension — ADR-398):
+Kind 31419  — Reputation layer     (Agent review attestation — IMPLEMENTED)
+Kind 31423  — Trust layer          (Verified-agent badge — IMPLEMENTED)
+Kind 31416–31418, 31420–31422, 31424 — Reserved (registered, not yet published)
 
 External NIPs (not Colabonate-defined):
 Kind 9734   — Economic layer       (NIP-57: Lightning Zap Request)
@@ -181,6 +188,7 @@ All Colabonate events use standard NIP-01 tags plus the following custom tags:
 | `country` | ISO 3166-1 alpha-2 | Geo filtering |
 | `region` | String | Geo filtering |
 | `city` | String | Geo filtering |
+| `offer_type` | Lowercase enum: `service` \| `product` \| `item` \| `coop` \| `agent_setup` | Marketplace classification (ADR-305 adds `agent_setup`; optional, absent = `service`) |
 
 ### Content
 
@@ -1470,6 +1478,88 @@ The event kinds 30017–30027 and 30414–30415 are currently an **internal Cola
 5. Update this document to reflect official NIP numbers once assigned
 
 Until NIP registration is complete, implementers should use the kind numbers as specified here. Client software should treat these as **unofficial** kinds and not assume other non-Colabonate relays will index or retain them.
+
+---
+
+## Agent Marketplace Kinds (31416–31424)
+
+> **(PDC: see ADR-398)** — The Agent Marketplace (ADRs 304–397) is an **optional protocol extension**: agent kinds and flows are not required for a "Colabonate-compatible" implementation. This section registers the agent kind block, marks which kinds are implemented and published, and reserves the rest so no implementer collides with a planned number.
+
+**Stability:** `31419`, `31423` — Stable (published) · `31416`–`31418`, `31420`–`31424` — Reserved.
+
+### Kind range
+
+| Kind | Purpose | Status |
+|------|---------|--------|
+| 31416 | AgentProfile identity | Reserved (not published) |
+| 31417 | Agent Capability Attestation | Reserved — builder exists, publish pending (FU-413) |
+| 31418 | Agent Execution Proof | Reserved (not published) |
+| 31419 | Agent Review Attestation | **[IMPLEMENTED]** |
+| 31420–31422 | AgentTask family (post / apply / assign) | Reserved (FU-425) |
+| 31423 | Verified-Agent-Badge Attestation | **[IMPLEMENTED]** |
+| 31424 | AgentNetwork identity | Reserved (FU-485/FU-488) |
+
+**Not allocated:** `31430`–`31438` (ADR-322's Nostr-native workspace-event model — design superseded by the canister's signed-Candid transport, never built) and `31439`–`31444` (ADR-323 Buzz bridge — deliberately deferred). Do not claim these numbers. Kind `20001` (canister presence) is likewise not allocated; `Workspace.status` already covers the only real consumer.
+
+### Kind 31419 — Agent Review Attestation
+
+**Status:** [IMPLEMENTED] (ADR-307 D4) · **Stability:** Stable
+
+Portable, BIP-340-signed multi-dimension review for a completed `AGENT_SETUP` ticket. Published **alongside** (not instead of) the generic Kind 30024/30411 review, so agent-specific quality dimensions are readable by any relay-connected client without calling the Colabonate API.
+
+Addressable event, `d = agent-review-<ticketId>-<reviewer-pubkey[0..8]>`:
+
+| Tag | Required | Format | Description |
+|-----|----------|--------|-------------|
+| `d` | yes | String | `agent-review-<ticketId>-<reviewer-pubkey[0..8]>` |
+| `p` | yes | 32-byte hex pubkey | Reviewee (agent owner's pubkey) |
+| `ticket` | yes | Ticket id | The completed `AGENT_SETUP` ticket |
+| `accuracy` | no | Integer 1–5 | Result accuracy |
+| `speed` | no | Integer 1–5 | Execution speed |
+| `reliability` | no | Integer 1–5 | Ran without failure |
+| `quality` | no | Integer 1–5 | Output quality |
+| `would_reuse` | no | `0` \| `1` | Would book again |
+| `amount_sats` | no | Integer string | Ticket amount (reputation context) |
+
+`content` = free-text review. Authorization: only a participant of `ticket` may publish; at most one per (ticket, reviewer). Consumers MUST treat tag values as signed claims, not verified facts — the reference server computes its own score (see [reputation-protocol.md](./reputation-protocol.md), reference-only).
+
+### Kind 31423 — Verified-Agent-Badge Attestation
+
+**Status:** [IMPLEMENTED] (ADR-315 D3) · **Stability:** Stable
+
+Platform-level trust badge. Unlike 31417 (any customer attests) or 31419 (the reviewer attests), this is signed server-side by a dedicated **platform attestation key** — never the founder's personal identity — so any Nostr client can recognize "signed by this stable pubkey" as Colabonate's own badge without calling the API.
+
+Addressable event, `d = agent-verified-<agentProfileId>`:
+
+| Tag | Required | Format | Description |
+|-----|----------|--------|-------------|
+| `d` | yes | String | `agent-verified-<agentProfileId>` |
+| `p` | yes | 32-byte hex pubkey | Agent owner pubkey |
+| `agent_profile_id` | yes | String | Reference `AgentProfile.id` |
+| `status` | yes | `verified` \| `unverified` | Current badge state |
+| `verified_at` | no | ISO-8601 | Grant timestamp |
+
+Replaceable semantics: re-publishing the same `d` address with a new `status` keeps current truth, so a revoke cannot orphan a stale "verified" event. `content` is empty.
+
+### Reserved kinds (registered — do not publish yet)
+
+| Kind | Design | Source |
+|------|--------|--------|
+| 31416 | AgentProfile identity event (analogous to Kind 0 for humans) | ADR-304 |
+| 31417 | Capability Attestation — ticket-bound customer claim about an agent's capabilities. Reference builder tag shape: `d=agent-claim-<ticketId>-<attester[0..8]>`, `p=<ownerPubkey>`, `ticket`, `evidence`, repeated `c=<capability>`. | ADR-316 D2 / ADR-317 D1 — builder shipped, publish pending (FU-413) |
+| 31418 | Execution Proof — signed agent output for the audit trail | ADR-318 |
+| 31420–31422 | AgentTask family (task post / application / assignment) | ADR-319 D6 (FU-425) |
+| 31424 | AgentNetwork identity + membership | ADR-328 D6 (FU-485/FU-488) |
+
+Implementers MUST NOT publish to reserved kinds. Numbers are held so a future implementation does not collide — three prior collisions occurred in this suite (FU-401/405, FU-407/408, FU-450 → 31423).
+
+### Reserved tags (planned — do not rely on yet)
+
+Skill bundles (ADR-396 Part B, FU-853–855) plan to expose public skill metadata on the listing and sealed bodies on the offer: `["skill", <name>, <sha256>]` tags on Kind 30402/30017 plus a `skills[]` entry in `agentConfigMeta` (per-skill public opt-in; v1 limits ≤ 8 skills, ≤ 20 KB each). **None of this is implemented** — no such tag is emitted today. It is listed only so an implementer does not invent a conflicting contract.
+
+### Offer classification tag
+
+Kind 30017 / 30402 offers carry an optional `offer_type` tag (lowercase): `service`, `product`, `item`, `coop`, `agent_setup`. `agent_setup` marks an Agent Setup offer (ADR-305); its ticket and billing semantics are described in [ticket-system.md](./ticket-system.md) and [../workflows/agent-marketplace-protocol.md](../workflows/agent-marketplace-protocol.md).
 
 ---
 
