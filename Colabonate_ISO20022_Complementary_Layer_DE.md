@@ -7,6 +7,7 @@ date: 2026-08-06
 target_body: "[Name des Fachgremiums]"
 target_repo: "[Zielrepository: bei Integration eintragen]"
 language: de
+license: "MIT"
 ---
 
 <div class="title-page">
@@ -24,6 +25,8 @@ language: de
 **Adressat:** [Name des Fachgremiums]
 
 **Zielrepository:** [Zielrepository: bei Integration eintragen]
+
+**Lizenz:** MIT License — siehe die Datei `LICENSE` im Repository-Stammverzeichnis.
 
 > *Offener Punkt:* Die Bezeichnung des adressierten Fachgremiums sowie das Zielrepository sind dem Autor nicht bekannt und daher als Platzhalter markiert. Diese beiden Felder können erst bei der Integration in das Ziel-Repository final benannt werden.
 

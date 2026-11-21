@@ -21,7 +21,7 @@ Anyone with a Lightning wallet can:
 - Build reputation through verifiable, non-transferable credentials
 - Participate in community governance via Nostr-based voting
 
-This repository contains the **protocol specification** and supporting documentation. It is maintained by the Colabonate Foundation and licensed under the MIT License. The positioning papers (whitepaper, ISO 20022 complementary layer) that also live in this repository are licensed separately — see [License](#license) below.
+This repository contains the **protocol specification** and supporting documentation. It is maintained by the Colabonate Foundation and licensed under the MIT License. The positioning papers (whitepaper, ISO 20022 complementary layer) that also live in this repository are covered by the same licence — see [License](#license) below.
 
 **The goal of this repository:** Through open development and community review, reach `v1.0.0` — a stable, implementer-ready protocol standard.
 
@@ -100,9 +100,9 @@ No document has yet reached `Stable` status. This is the goal of our current ope
 
 This protocol is developed in the open. You can follow and participate via:
 
-- **[GitHub Issues](https://github.com/Colabonate/colabonate-protocol/issues)** — Open questions, spec proposals, bug reports
-- **[GitHub Projects](https://github.com/Colabonate/colabonate-protocol/projects)** — Milestone-based roadmap (v0.1 → v0.2 → v1.0)
-- **[Discussions](https://github.com/Colabonate/colabonate-protocol/discussions)** — Design conversations and implementation feedback
+- **[GitHub Issues](https://github.com/Colabonate/Colabonate_Protocol/issues)** — Open questions, spec proposals, bug reports
+- **[GitHub Discussions](https://github.com/Colabonate/Colabonate_Protocol/discussions)** — Design conversations and implementation feedback
+- **[Contributing guide](CONTRIBUTING.md)** — How to propose a spec change, and the PDC marker process
 
 ### Issue Labels
 
@@ -157,11 +157,12 @@ Contributions to the protocol specification are welcome. Please read [CONTRIBUTI
 | Content | License |
 |---------|---------|
 | Protocol documentation (`docs/protocols/`) | [MIT License](LICENSE) |
-| Positioning papers — whitepaper, ISO 20022 complementary layer (`colabonate_whitepaper_*`, `Colabonate_ISO20022_Complementary_Layer_*`) | [CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/) |
+| Positioning papers — whitepaper, ISO 20022 complementary layer (`colabonate_whitepaper_*`, `Colabonate_ISO20022_Complementary_Layer_*`) | [MIT License](LICENSE) |
+| Reference implementation (`github.com/Colabonate/Colabonate-App`) | [MIT License](https://github.com/Colabonate/Colabonate-App/blob/main/LICENSE) |
 
-The Colabonate Protocol specification is freely available for use, adaptation, and implementation under the terms of the MIT License, to encourage adoption as an open standard.
+Everything in this repository is licensed under the MIT License, to encourage adoption as an open standard.
 
-The positioning papers are licensed under CC BY-ND 4.0 (no derivatives) instead — their wording is the basis of a prior-art / defensive-publication claim, so their text must stay unmodified and unredistributed-under-another-name to keep that evidentiary value intact.
+**Version history of the positioning papers.** The whitepaper was published under CC BY-ND 4.0 up to and including **v8**, so that its wording carried a prior-art / defensive-publication claim. Both v8 files remain published unmodified with their OpenTimestamps proofs, as the evidentiary record of that claim. From **v9** onward the whitepaper is MIT licensed like the rest of the repository; v9 is a new version, not an edit of v8.
 
 ---
 
@@ -173,7 +174,10 @@ The positioning papers are licensed under CC BY-ND 4.0 (no derivatives) instead 
 |--|------|
 | 🌐 Website | [colabonate.com](https://colabonate.com) |
 | 🐙 GitHub | [github.com/Colabonate](https://github.com/Colabonate) |
-| 💬 Discussions | [GitHub Discussions](https://github.com/Colabonate/colabonate-protocol/discussions) |
+| 💬 Discussions | [GitHub Discussions](https://github.com/Colabonate/Colabonate_Protocol/discussions) |
+| 🐛 Issues | [GitHub Issues](https://github.com/Colabonate/Colabonate_Protocol/issues) |
+| 🧩 Reference implementation | [Colabonate-App](https://github.com/Colabonate/Colabonate-App) |
+| 🤝 Commerce standards | [Open Markets Specification](https://github.com/OpenMarketsFoundation/specification) |
 | 🤝 Open Collective | [opencollective.com/colabonate](https://opencollective.com/colabonate) |
 | 🎬 YouTube | [youtube.com/@colabonate](https://www.youtube.com/@colabonate) |
 | 🐦 X / Twitter | [x.com/Colabonate](https://x.com/Colabonate) |
@@ -182,5 +186,5 @@ The positioning papers are licensed under CC BY-ND 4.0 (no derivatives) instead 
 
 ---
 
-*Colabonate Protocol — Decentralized. Open. Bitcoin-only.*
+*Colabonate Protocol — A Nostr extension. Decentralized. Open. Bitcoin-only.*
 *Maintained by the [Colabonate Foundation](https://colabonate.com) · [github.com/Colabonate](https://github.com/Colabonate)*

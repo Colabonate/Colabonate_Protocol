@@ -7,6 +7,7 @@ date: 2026-08-06
 target_body: "[Name of the target committee]"
 target_repo: "[Target repository: to be filled in at integration]"
 language: en
+license: "MIT"
 ---
 
 <div class="title-page">
@@ -24,6 +25,8 @@ language: en
 **Addressee:** [Name of the target committee]
 
 **Target repository:** [Target repository: to be filled in at integration]
+
+**License:** MIT License — see the `LICENSE` file in the repository root.
 
 > *Open item:* The name of the addressed committee and the target repository are not known to the author and are therefore marked as placeholders. Both fields can only be finalized once the paper is integrated into the target repository.
 
