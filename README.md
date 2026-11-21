@@ -158,7 +158,7 @@ Contributions to the protocol specification are welcome. Please read [CONTRIBUTI
 |---------|---------|
 | Protocol documentation (`docs/protocols/`) | [MIT License](LICENSE) |
 | Positioning papers — whitepaper, ISO 20022 complementary layer (`colabonate_whitepaper_*`, `Colabonate_ISO20022_Complementary_Layer_*`) | [MIT License](LICENSE) |
-| Reference implementation (`github.com/Colabonate/Colabonate-App`) | [MIT License](https://github.com/Colabonate/Colabonate-App/blob/main/LICENSE) |
+| Reference implementation (`github.com/Colabonate/Colabonate`) | [MIT License](https://github.com/Colabonate/Colabonate/blob/main/LICENSE) |
 
 Everything in this repository is licensed under the MIT License, to encourage adoption as an open standard.
 
@@ -176,7 +176,7 @@ Everything in this repository is licensed under the MIT License, to encourage ad
 | 🐙 GitHub | [github.com/Colabonate](https://github.com/Colabonate) |
 | 💬 Discussions | [GitHub Discussions](https://github.com/Colabonate/Colabonate_Protocol/discussions) |
 | 🐛 Issues | [GitHub Issues](https://github.com/Colabonate/Colabonate_Protocol/issues) |
-| 🧩 Reference implementation | [Colabonate-App](https://github.com/Colabonate/Colabonate-App) |
+| 🧩 Reference implementation | [Colabonate/Colabonate](https://github.com/Colabonate/Colabonate) |
 | 🤝 Commerce standards | [Open Markets Specification](https://github.com/OpenMarketsFoundation/specification) |
 | 🤝 Open Collective | [opencollective.com/colabonate](https://opencollective.com/colabonate) |
 | 🎬 YouTube | [youtube.com/@colabonate](https://www.youtube.com/@colabonate) |
