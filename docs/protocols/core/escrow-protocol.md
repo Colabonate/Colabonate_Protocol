@@ -65,7 +65,7 @@ At ticket creation the seller's configured receiving wallet is resolved (`Offer.
 
 ### 1.4 Buyer Protection (Path 1)
 
-Path 1 protection is **reputation, not cryptography**: reviews (Kind 30024/30406) plus honest labeling ("Direct payment — no escrow protection"). No escrow promise is made that cannot be kept. Direct-Pay is therefore the recommended path for micro-trades where on-chain escrow fees are disproportionate.
+Path 1 protection is **reputation, not cryptography**: reviews (Kind 30024/30411) plus honest labeling ("Direct payment — no escrow protection"). No escrow promise is made that cannot be kept. Direct-Pay is therefore the recommended path for micro-trades where on-chain escrow fees are disproportionate.
 
 ### 1.5 Disputes on Direct-Pay
 

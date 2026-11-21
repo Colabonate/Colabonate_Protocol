@@ -1121,11 +1121,13 @@ To comply with [NIP-99 (Classified Listings Standard)](https://github.com/nostr-
 | 30018 | 30407 | Ticket Created | Transaction layer |
 | 30019 | 30408 | Ticket Status Update | Transaction state machine |
 | 30020 | 30409 | Dispute Opened | Dispute layer |
-| 30021 | 30405 | Verification Credential | Identity layer |
-| 30024 | 30406 | Reputation / Review | Reputation layer |
+| 30021 | 30410 | Verification Credential | Identity layer — **not** 30405, see below |
+| 30024 | 30411 | Reputation / Review | Reputation layer — **not** 30406, see below |
 | 30027 | 30404 | Company Profile | Marketplace layer |
 | 30028 | 30414 | Cooperation Proposal | NIP-C cooperation |
 | 30029 | 30415 | Milestone Event | NIP-C cooperation |
+
+**Kind 30405 and 30406 are reserved for the Open Markets specification and are not used by Colabonate.** The Open Markets spec (formerly Gamma Markets `market-spec`) defines **30405 as Product Collection** and **30406 as Shipping Option**; Colabonate adopts both verbatim (PDC: see ADR-172, ADR-173, ADR-277 D0). Because those numbers belong to the other spec, Colabonate's credential and review events are published to **30410 / 30411** instead. Claiming 30405 / 30406 for a different meaning would create a direct kind-number conflict with the ecosystem we interoperate with, so it must not happen.
 
 **Implementation:** Legacy and NIP-compliant kinds are published in parallel. Clients may subscribe to either range. Only `30017–30019` are in genuine conflict with NIP-15 (hard dual-publish); the remaining legacy/NIP-99 pairs are a convention for compatibility. Legacy kinds will be deprecated after a deprecation period (PDC: see ADR-101 for timeline).
 
